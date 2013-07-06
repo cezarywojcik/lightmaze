@@ -37,6 +37,10 @@ jQuery(function($) {
   // vars
   var el, renderer, camera, scene, cube;
 
+  var mazeObject;
+
+  var tileSize = 512;
+
   function init(selector) {
     el = $(selector);
 
@@ -48,25 +52,47 @@ jQuery(function($) {
     // camera
     camera = new THREE.PerspectiveCamera(60,
           window.innerWidth/(window.innerHeight-4), 0.1, 5000);
-    camera.position.y = 150;
-    camera.position.z = 350;
+    camera.position.z = tileSize/2;
 
     // scene
     scene = new THREE.Scene();
 
+    // object
+    mazeObject = sample;
 
+    // add maze
+    addMaze();
 
     // render
     render();
   }
 
+  // render
   function render() {
     renderer.render(scene, camera);
 
-    cube.rotation.x += 0.02;
-    cube.rotation.y += 0.03;
+    camera.rotation.y += 0.02;
 
     requestAnimationFrame(render);
+  }
+
+  // add maze meshes from mazeObject
+  function addMaze() {
+    var maze = mazeObject.maze;
+    for (var i = 0; i < maze.length; i++) {
+      for (var j = 0; j < maze[i].length; j++) {
+        var tile = maze[i][j];
+        var x = j;
+        var y = i;
+        var geometry = new THREE.PlaneGeometry(tileSize, tileSize);
+        var material = new THREE.MeshNormalMaterial();
+        var plane = new THREE.Mesh(geometry, material);
+        plane.overdraw = true;
+        plane.position.x = x*tileSize;
+        plane.position.y = y*tileSize;
+        scene.add(plane);
+      }
+    }
   }
 
   // resize handler
