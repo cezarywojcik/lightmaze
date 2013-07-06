@@ -52,6 +52,7 @@ jQuery(function($) {
     // camera
     camera = new THREE.PerspectiveCamera(60,
           window.innerWidth/(window.innerHeight-4), 0.1, 5000);
+    camera.position.y = tileSize/2;
     camera.position.z = tileSize/2;
 
     // scene
@@ -84,13 +85,51 @@ jQuery(function($) {
         var tile = maze[i][j];
         var x = j;
         var y = i;
-        var geometry = new THREE.PlaneGeometry(tileSize, tileSize);
-        var material = new THREE.MeshNormalMaterial();
-        var plane = new THREE.Mesh(geometry, material);
-        plane.overdraw = true;
-        plane.position.x = x*tileSize;
-        plane.position.y = y*tileSize;
-        scene.add(plane);
+        var geometry, material, plane;
+        if (tile.up) {
+          geometry = new THREE.PlaneGeometry(tileSize, tileSize, 1, 1);
+          geometry.vertices[0].x = x*tileSize;
+          geometry.vertices[0].y = 0;
+          geometry.vertices[0].z = (y+1)*tileSize;
+          geometry.vertices[1].x = (x+1)*tileSize;
+          geometry.vertices[1].y = 0;
+          geometry.vertices[1].z = (y+1)*tileSize;
+          geometry.vertices[2].x = x*tileSize;
+          geometry.vertices[2].y = tileSize;
+          geometry.vertices[2].z = (y+1)*tileSize;
+          geometry.vertices[3].x = (x+1)*tileSize;
+          geometry.vertices[3].y = tileSize;
+          geometry.vertices[3].z = (y+1)*tileSize;
+          material = new THREE.MeshBasicMaterial({
+            color: 0x000000,
+            wireframe: true
+          });
+          plane = new THREE.Mesh(geometry, material);
+          plane.overdraw = true;
+          scene.add(plane);
+        }
+        if (tile.down) {
+          geometry = new THREE.PlaneGeometry(tileSize, tileSize, 1, 1);
+          geometry.vertices[0].x = x*tileSize;
+          geometry.vertices[0].y = 0;
+          geometry.vertices[0].z = y*tileSize;
+          geometry.vertices[1].x = (x+1)*tileSize;
+          geometry.vertices[1].y = 0;
+          geometry.vertices[1].z = y*tileSize;
+          geometry.vertices[2].x = x*tileSize;
+          geometry.vertices[2].y = tileSize;
+          geometry.vertices[2].z = y*tileSize;
+          geometry.vertices[3].x = (x+1)*tileSize;
+          geometry.vertices[3].y = tileSize;
+          geometry.vertices[3].z = y*tileSize;
+          material = new THREE.MeshBasicMaterial({
+            color: 0x000000,
+            wireframe: true
+          });
+          plane = new THREE.Mesh(geometry, material);
+          plane.overdraw = true;
+          scene.add(plane);
+        }
       }
     }
   }
