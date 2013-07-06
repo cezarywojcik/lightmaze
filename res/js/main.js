@@ -7,12 +7,12 @@ jQuery(function($) {
 
     // renderer
     renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight-4);
     el.html(renderer.domElement);
 
     // camera
     camera = new THREE.PerspectiveCamera(60,
-          window.innerWidth/(window.innerHeight), 0.1, 5000);
+          window.innerWidth/(window.innerHeight-4), 0.1, 5000);
     camera.position.y = 150;
     camera.position.z = 350;
 
@@ -28,6 +28,7 @@ jQuery(function($) {
     cube.overdraw = true;
     scene.add(cube);
 
+    // render
     render();
   }
 
@@ -39,6 +40,13 @@ jQuery(function($) {
 
     requestAnimationFrame(render);
   }
+
+  // resize handler
+  $(window).resize(function() {
+      camera.aspect = window.innerWidth/(window.innerHeight-4);
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight-4);
+    });
 
   init('#game');
 });
