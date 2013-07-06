@@ -1,3 +1,38 @@
+var sample = {
+  start: {x:0, y:0},
+  end: {x:2, y:2},
+  maze: [
+    [
+      {
+        up: true,
+        down: false,
+        left: true,
+        right: false
+      },
+      {
+        up: true,
+        down: false,
+        left: false,
+        right: true
+      }
+    ],
+    [
+      {
+        up: false,
+        down: true,
+        left: true,
+        right: false
+      },
+      {
+        up: false,
+        down: true,
+        left: false,
+        right: true
+      }
+    ]
+  ]
+};
+
 jQuery(function($) {
   // vars
   var el, renderer, camera, scene, cube;
@@ -19,14 +54,7 @@ jQuery(function($) {
     // scene
     scene = new THREE.Scene();
 
-    // cube
-    cube = new THREE.Mesh(new THREE.CubeGeometry(200,200,200),
-      new THREE.MeshNormalMaterial({
-        color: 0x00ff00
-      }));
-    cube.position.y = 150;
-    cube.overdraw = true;
-    scene.add(cube);
+
 
     // render
     render();
