@@ -1,6 +1,10 @@
 //initialize array
-for (var i=0;i<=maxheight;i++) {
+var maxheight = new Number(5);
 
-//derp derp
+for (var i=0; i<=maxheight; i++) {
+
+  for (var j=0; j<=maxwidth; j++) {
+  
+  }
 
 }
