@@ -22,6 +22,19 @@ body {
   top: 44%;
 }
 
+#endGame {
+  position: absolute;
+  left: 13%;
+  top: 44%;
+  width: 50%;
+  height: 50%;
+  opacity: 0.6;
+  z-index: -10;
+}
+
+#lostMessage {
+  color: #FFF;
+}
 
 h1 {
   margin-left: 40px;
