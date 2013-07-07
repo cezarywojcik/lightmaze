@@ -84,13 +84,12 @@ $(function($) {
     controls.getObject().position.z = tileSize;
     controls.enabled = true;
     scene.add(controls.getObject());
-    console.log(controls.getObject().rotation);
 
     // spot light
     spotLight = new THREE.SpotLight(0xffffff, settings.lightIntensity,
       tileSize*4);
-    spotLight.angle = Math.PI/5;
-    spotLight.exponent = 50;
+    spotLight.angle = Math.PI/4;
+    spotLight.exponent = 40;
     spotLight.target.position.set(0, controls.getPitchObject().rotation.x, -1);
     controls.getObject().add(spotLight.target);
     spotLight.position = controls.getObject().position;
@@ -99,6 +98,7 @@ $(function($) {
     // directional light
     dirLight = new THREE.DirectionalLight(0x000000, 1);
     dirLight.target.position.set(0, 1, 0);
+    dirLight.position = controls.getObject().position;
     scene.add(dirLight);
 
     // ray caster
