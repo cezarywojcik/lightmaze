@@ -140,7 +140,7 @@ $(function($) {
     renderer.render(scene, camera);
     prevCam.copy(controls.getObject().position);
 
-    if (settings.spike && Math.random() > 0.4) {
+    if (settings.spike && Math.random() > 0.42) {
       spotLight.intensity += settings.spikeValue;
       settings.spike = false;
     }
@@ -149,6 +149,8 @@ $(function($) {
 
     if (spotLight.intensity < 0) {
       // end game
+    } else if (spotLight.intensity < 1 && back.volume > 0.006) {
+      back.volume -= 0.005;
     }
 
     if (tilePoint.x === mazeObject.end.x && tilePoint.y === mazeObject.end.y) {
@@ -165,13 +167,14 @@ $(function($) {
         document.location.reload(true);
       }
     } else if (settings.lightOn) {
-      if (!settings.spike && Math.random() > 0.95) {
-        settings.spikeValue = Math.random()*spotLight.intensity;
+      if (!settings.spike && Math.random() >
+        spotLight.intensity/settings.lightIntensity) {
+        settings.spikeValue = Math.random()*spotLight.intensity*0.9;
         spotLight.intensity -= settings.spikeValue;
         settings.spike = true;
       }
       if(settings.started && settings.lightOn) {
-        spotLight.intensity -= Math.random()/180;
+        spotLight.intensity -= Math.random()/150;
       }
     }
 
