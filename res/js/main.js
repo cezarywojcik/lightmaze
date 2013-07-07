@@ -55,94 +55,107 @@ $(function($) {
     lightIntensity: 1
   };
 
-  var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
+  var havePointerLock = 'pointerLockElement' in document ||
+  'mozPointerLockElement' in document ||
+  'webkitPointerLockElement' in document;
 
-	if ( havePointerLock ) {
+  if (havePointerLock) {
+    var element = document.body;
+    var pointerlockchange = function ( event ) {
+      if ( document.pointerLockElement === element ||
+        document.mozPointerLockElement === element ||
+        document.webkitPointerLockElement === element ) {
+        controls.enabled = true;
+        blocker.style.display = 'none';
+      } else {
+        controls.enabled = false;
+        blocker.style.display = '-webkit-box';
+        blocker.style.display = '-moz-box';
+        blocker.style.display = 'box';
+        instructions.style.display = '';
+      }
+    };
 
-		var element = document.body;
+    var pointerlockerror = function ( event ) {
+      instructions.style.display = '';
+    };
 
-		var pointerlockchange = function ( event ) {
+    // Hook pointer lock state change events
+    document.addEventListener( 'pointerlockchange',
+      pointerlockchange, false );
+    document.addEventListener( 'mozpointerlockchange',
+      pointerlockchange, false );
+    document.addEventListener( 'webkitpointerlockchange',
+      pointerlockchange, false );
 
-			if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
+    document.addEventListener('pointerlockerror',
+      pointerlockerror, false);
+    document.addEventListener('mozpointerlockerror',
+      pointerlockerror, false);
+    document.addEventListener('webkitpointerlockerror',
+      pointerlockerror, false );
 
-				controls.enabled = true;
+    document.addEventListener('click', function ( event ) {
+      // Ask the browser to lock the pointer
+      element.requestPointerLock = element.requestPointerLock ||
+        element.mozRequestPointerLock || element.webkitRequestPointerLock;
 
-				blocker.style.display = 'none';
-0
-			} else {
+      if (/Firefox/i.test( navigator.userAgent)) {
+        var fullscreenchange = function (event) {
+          if ( document.fullscreenElement === element ||
+            document.mozFullscreenElement === element ||
+            document.mozFullScreenElement === element ) {
 
-				controls.enabled = false;
+            document.removeEventListener('fullscreenchange',
+              fullscreenchange );
+            document.removeEventListener('mozfullscreenchange',
+              fullscreenchange );
+            element.requestPointerLock();
+          }
+        };
 
-				blocker.style.display = '-webkit-box';
-				blocker.style.display = '-moz-box';
-				blocker.style.display = 'box';
+        document.addEventListener( 'fullscreenchange',
+          fullscreenchange, false );
+        document.addEventListener( 'mozfullscreenchange',
+          fullscreenchange, false );
 
-				instructions.style.display = '';
+        element.requestFullscreen = element.requestFullscreen ||
+          element.mozRequestFullscreen || element.mozRequestFullScreen ||
+          element.webkitRequestFullscreen;
 
-			}
+        element.requestFullscreen();
 
-		}
+      } else {
+        element.requestPointerLock();
+      }
+    }, false );
+  } else {
+    // cant pointer lock
+  }
 
-		var pointerlockerror = function ( event ) {
+  // textures
+  var numTexturesLoaded = 0;
+  var textures = {
+    wallTexture: loadTexture('res/img/wall.png'),
+    ceilingTexture: loadTexture('res/img/ceiling.png')
+  };
 
-			instructions.style.display = '';
+  function loadTexture(image) {
+    var texture = new THREE.ImageUtils.loadTexture(image,
+      new THREE.UVMapping(), function() {
+        textureLoaded();
+    });
+    texture.needsUpdate = true;
+    return texture;
+  }
 
-		}
-
-		// Hook pointer lock state change events
-		document.addEventListener( 'pointerlockchange', pointerlockchange, false );
-		document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
-		document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
-
-		document.addEventListener( 'pointerlockerror', pointerlockerror, false );
-		document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
-		document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
-
-		document.addEventListener( 'click', function ( event ) {
-
-			// Ask the browser to lock the pointer
-			element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
-
-			if ( /Firefox/i.test( navigator.userAgent ) ) {
-
-				var fullscreenchange = function ( event ) {
-
-					if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
-
-						document.removeEventListener( 'fullscreenchange', fullscreenchange );
-						document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
-
-						element.requestPointerLock();
-					}
-
-				}
-
-				document.addEventListener( 'fullscreenchange', fullscreenchange, false );
-				document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
-
-				element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
-
-				element.requestFullscreen();
-
-			} else {
-
-				element.requestPointerLock();
-
-			}
-
-		}, false );
-
-	} else {
-
-		instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
-
-	}
-  // texture
-  // var wallTexture = new THREE.ImageUtils.loadTexture('res/img/wall.png',
-  //   new THREE.UVMapping(), function() {
-  //     init();
-  // });
-  // wallTexture.needsUpdate = true;
+  function textureLoaded() {
+    numTexturesLoaded++;
+    console.log(numTexturesLoaded);
+    if (numTexturesLoaded === Object.keys(textures).length) {
+      init();
+    }
+  }
 
   function init() {
     el = $(selector);
@@ -187,7 +200,7 @@ $(function($) {
     ray = new THREE.Raycaster();
 
     // get maze object
-    mazeObject = mazegen(4, 4);
+    mazeObject = mazegen(5, 5);
 
     // add maze.
     addMaze();
@@ -211,9 +224,9 @@ $(function($) {
 
   // plane geo
   function getPlane() {
-    var geometry = new THREE.PlaneGeometry(tileSize, tileSize, 20, 20);
+    var geometry = new THREE.PlaneGeometry(tileSize, tileSize, 10, 10);
     var material = new THREE.MeshPhongMaterial({
-      color: 0x660000
+      map: textures.wallTexture
     });
     var result = new THREE.Mesh(geometry, material);
     result.overdraw = true;
@@ -230,9 +243,9 @@ $(function($) {
         var x = j;
         var y = i;
         // ceiling
-        var ceilingGeo = new THREE.PlaneGeometry(tileSize, tileSize, 20, 20);
+        var ceilingGeo = new THREE.PlaneGeometry(tileSize, tileSize, 5, 5);
         var ceilingMat = new THREE.MeshPhongMaterial({
-          color: 0x0000ff
+          map: textures.ceilingTexture
         });
         var ceiling = new THREE.Mesh(ceilingGeo, ceilingMat);
         ceiling.rotation.x = Math.PI/2;
@@ -242,9 +255,9 @@ $(function($) {
         scene.add(ceiling);
         objects.push(ceiling);
         // ground
-        var groundGeo = new THREE.PlaneGeometry(tileSize, tileSize, 20, 20);
+        var groundGeo = new THREE.PlaneGeometry(tileSize, tileSize, 5, 5);
         var groundMat = new THREE.MeshPhongMaterial({
-          color: 0x00ff00
+          map: textures.ceilingTexture
         });
         var ground = new THREE.Mesh(groundGeo, groundMat);
         ground.rotation.x = 3*Math.PI/2;
@@ -296,6 +309,4 @@ $(function($) {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
-
-  init();
 });
