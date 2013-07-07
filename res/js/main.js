@@ -37,7 +37,7 @@ var sample = {
 
 jQuery(function($) {
   // vars
-  var el, renderer, camera, scene, cube;
+  var el, renderer, camera, scene, cube, pointLight;
 
   var mazeObject;
 
@@ -61,10 +61,16 @@ jQuery(function($) {
     // scene
     scene = new THREE.Scene();
 
+    // point light
+    pointLight = new THREE.PointLight(0xffffff, 0.6);
+    pointLight.position = camera.position;
+    pointLight.rotation = camera.rotation;
+    scene.add(pointLight);
+
     // object
     mazeObject = sample;
 
-    // add maze
+    // add maze.
     addMaze();
 
     // render
@@ -75,7 +81,7 @@ jQuery(function($) {
   function render() {
     renderer.render(scene, camera);
 
-    camera.rotation.y += 0.005;
+    camera.rotation.y += 0.02;
 
     requestAnimationFrame(render);
   }
@@ -125,20 +131,18 @@ jQuery(function($) {
         var y = i;
         var geometry, plane;
         var material = new THREE.MeshLambertMaterial({
-            color: 0x000000,
-            wireframe: true,
-            side: THREE.DoubleSide
+            color: 0xff0000
         });
         if (tile.up) {
           geometry = getPlaneGeometry();
-          geometry.vertices[0].x = x*tileSize;
-          geometry.vertices[0].z = y*tileSize;
-          geometry.vertices[1].x = (x+1)*tileSize;
-          geometry.vertices[1].z = y*tileSize;
-          geometry.vertices[2].x = x*tileSize;
-          geometry.vertices[2].z = y*tileSize;
-          geometry.vertices[3].x = (x+1)*tileSize;
+          geometry.vertices[3].x = x*tileSize;
           geometry.vertices[3].z = y*tileSize;
+          geometry.vertices[2].x = (x+1)*tileSize;
+          geometry.vertices[2].z = y*tileSize;
+          geometry.vertices[1].x = x*tileSize;
+          geometry.vertices[1].z = y*tileSize;
+          geometry.vertices[0].x = (x+1)*tileSize;
+          geometry.vertices[0].z = y*tileSize;
           plane = new THREE.Mesh(geometry, material);
           plane.overdraw = true;
           scene.add(plane);
@@ -173,14 +177,14 @@ jQuery(function($) {
         }
         if (tile.right) {
           geometry = getPlaneGeometry();
-          geometry.vertices[0].x = (x+1)*tileSize;
-          geometry.vertices[0].z = y*tileSize;
-          geometry.vertices[1].x = (x+1)*tileSize;
-          geometry.vertices[1].z = (y+1)*tileSize;
-          geometry.vertices[2].x = (x+1)*tileSize;
-          geometry.vertices[2].z = y*tileSize;
           geometry.vertices[3].x = (x+1)*tileSize;
-          geometry.vertices[3].z = (y+1)*tileSize;
+          geometry.vertices[3].z = y*tileSize;
+          geometry.vertices[2].x = (x+1)*tileSize;
+          geometry.vertices[2].z = (y+1)*tileSize;
+          geometry.vertices[1].x = (x+1)*tileSize;
+          geometry.vertices[1].z = y*tileSize;
+          geometry.vertices[0].x = (x+1)*tileSize;
+          geometry.vertices[0].z = (y+1)*tileSize;
           plane = new THREE.Mesh(geometry, material);
           plane.overdraw = true;
           scene.add(plane);
