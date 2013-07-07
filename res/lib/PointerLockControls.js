@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.PointerLockControls = function (camera) {
+THREE.PointerLockControls = function (camera, mazeObject) {
+
+  var tileSize = 512;
 
   var scope = this;
 
@@ -25,7 +27,15 @@ THREE.PointerLockControls = function (camera) {
 
   var PI_2 = Math.PI / 2;
 
-  var onMouseMove = function (event) {
+  var getTile = function(camera) {
+    var x = camera.position.x;
+    var y = camera.position.z;
+    var newx = Math.floor(x/tileSize);
+    var newy = Math.floor(y/tileSize);
+    return mazeObject.maze[newx][newy];
+  };
+
+  var onMouseMove = function(event) {
 
     if (scope.enabled === false) return;
 
@@ -39,7 +49,7 @@ THREE.PointerLockControls = function (camera) {
 
   };
 
-  var onKeyDown = function (event) {
+  var onKeyDown = function(event) {
 
     switch (event.keyCode) {
 
@@ -71,7 +81,7 @@ THREE.PointerLockControls = function (camera) {
 
   };
 
-  var onKeyUp = function (event) {
+  var onKeyUp = function(event) {
 
     switch(event.keyCode) {
 
@@ -145,13 +155,22 @@ THREE.PointerLockControls = function (camera) {
     }
 
     yawObject.translateX(velocity.x);
+    if (getTile(yawObject).wall) {
+      yawObject.translateX(-2*velocity.x);
+    }
     yawObject.translateY(velocity.y);
+    if (getTile(yawObject).wall) {
+      yawObject.translateY(-2*velocity.y);
+    }
     yawObject.translateZ(velocity.z);
+    if (getTile(yawObject).wall) {
+      yawObject.translateZ(-2*velocity.z);
+    }
 
-    if (yawObject.position.y < 512/2) {
+    if (yawObject.position.y < tileSize/2) {
 
       velocity.y = 0;
-      yawObject.position.y = 512/2;
+      yawObject.position.y = tileSize/2;
 
       canJump = true;
 

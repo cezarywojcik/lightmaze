@@ -123,17 +123,6 @@ $(function($) {
     }
   }
 
-  function getTile(camera) {
-    var x = camera.position.x;
-    var y = camera.position.z;
-    var newx = Math.floor(x/tileSize);
-    var newy = Math.floor(y/tileSize);
-    return {
-      x: newx,
-      y: newy
-    };
-  }
-
   function init() {
     el = $(selector);
 
@@ -153,7 +142,7 @@ $(function($) {
           window.innerWidth/(window.innerHeight), 0.1, 10000);
 
     // controls
-    controls = new THREE.PointerLockControls(camera);
+    controls = new THREE.PointerLockControls(camera, mazeObject);
     controls.getObject().position.x = tileSize;
     controls.getObject().position.z = tileSize;
     controls.enabled = true;
@@ -197,10 +186,6 @@ $(function($) {
       spotLight.intensity += settings.spikeValue;
       settings.spike = false;
     }
-
-    var tilePoint = getTile(controls.getObject());
-    var currTile = mazeObject.maze[tilePoint.x][tilePoint.y];
-    console.log(currTile.wall);
 
     if (spotLight.intensity < 0) {
       settings.endGame = true;
