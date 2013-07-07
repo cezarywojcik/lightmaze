@@ -155,7 +155,7 @@ $(function($) {
       }
 
       if(settings.started)
-        spotLight.intensity -= Math.random()/150;
+        spotLight.intensity -= Math.random()/200;
     }
 
     spotLight.target.position.y = controls.getPitchObject().rotation.x;
@@ -256,13 +256,11 @@ function giveGameFocus(giveFocus){
           controls.enabled = true;
         } else {
           controls.enabled = false;
-          instructions.style.display = '';
         }
       };
     }
 
         var pointerlockerror = function ( event ) {
-          instructions.style.display = '';
         };
 
         // Hook pointer lock state change events

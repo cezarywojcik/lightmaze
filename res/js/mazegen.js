@@ -10,8 +10,8 @@ function mazegen(rows,cols) {
 
   var result = {
     start: {
-      x: cols-2,
-      y: rows-2
+      x: Math.floor(cols/2),
+      y: Math.floor(rows/2)
     },
     rows: rows,
     cols: cols
