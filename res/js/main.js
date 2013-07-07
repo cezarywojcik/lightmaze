@@ -211,7 +211,7 @@ $(function($) {
 
   // plane geo
   function getPlane() {
-    var geometry = new THREE.PlaneGeometry(tileSize, tileSize, 100, 100);
+    var geometry = new THREE.PlaneGeometry(tileSize, tileSize, 20, 20);
     var material = new THREE.MeshPhongMaterial({
       color: 0x660000
     });
@@ -230,7 +230,7 @@ $(function($) {
         var x = j;
         var y = i;
         // ceiling
-        var ceilingGeo = new THREE.PlaneGeometry(tileSize, tileSize, 100, 100);
+        var ceilingGeo = new THREE.PlaneGeometry(tileSize, tileSize, 20, 20);
         var ceilingMat = new THREE.MeshPhongMaterial({
           color: 0x0000ff
         });
@@ -242,7 +242,7 @@ $(function($) {
         scene.add(ceiling);
         objects.push(ceiling);
         // ground
-        var groundGeo = new THREE.PlaneGeometry(tileSize, tileSize, 100, 100);
+        var groundGeo = new THREE.PlaneGeometry(tileSize, tileSize, 20, 20);
         var groundMat = new THREE.MeshPhongMaterial({
           color: 0x00ff00
         });
