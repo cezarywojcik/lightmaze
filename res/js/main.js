@@ -43,6 +43,13 @@ $(function($) {
   back.volume = 0.3;
   back.play();
 
+  var horror1 = new Audio('res/aud/horror1.ogg');
+  horror1.preload = 'auto';
+  back.volume = 0.5;
+  var horror2 = new Audio('res/aud/horror2.ogg');
+  horror2.preload = 'auto';
+  back.volume = 0.5;
+
 
   // var prevcam
   var prevCam = new THREE.Vector3();
@@ -140,6 +147,14 @@ $(function($) {
     renderer.render(scene, camera);
     prevCam.copy(controls.getObject().position);
 
+    //noises
+    if (Math.random() > 0.9996) {
+      horror1.play();
+    }
+    if (Math.random() > 0.9996) {
+      horror2.play();
+    }
+
     if (settings.spike && Math.random() > 0.42) {
       spotLight.intensity += settings.spikeValue;
       settings.spike = false;
@@ -162,7 +177,8 @@ $(function($) {
       spotLight.intensity += Math.random();
       spotLight.exponent -= Math.random();
       spotLight.distance = 20000;
-      if (spotLight.exponent < 0) {
+      horror2.play();
+      if (spotLight.exponent < 1) {
         // restart
         document.location.reload(true);
       }
@@ -174,7 +190,7 @@ $(function($) {
         settings.spike = true;
       }
       if(settings.started && settings.lightOn) {
-        spotLight.intensity -= Math.random()/150;
+        spotLight.intensity -= Math.random()/100;
       }
     }
 
