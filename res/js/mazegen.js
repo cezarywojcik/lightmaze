@@ -132,7 +132,7 @@ function pathing(x, y, enterdir, pathcount) {
         }
       }
     }
-    while (Math.random() < 0.4 && !((upblocked || uppathed) && (downblocked ||
+    while (Math.random() < 0.3 && !((upblocked || uppathed) && (downblocked ||
       downpathed) && (leftblocked || leftpathed) && (rightblocked ||
       rightpathed)));
   }
