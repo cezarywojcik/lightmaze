@@ -15,7 +15,9 @@ $(function($) {
   var objects = [];
 
   var settings = {
-    lightIntensity: 1
+    lightIntensity: 10,
+    spike: false,
+    spikeValue: 0
   };
 
   var havePointerLock = 'pointerLockElement' in document ||
@@ -179,6 +181,18 @@ $(function($) {
   function render() {
     renderer.render(scene, camera);
 
+    if (!settings.spike && Math.random() > 0.8) {
+      settings.spikeValue = Math.random()*spotLight.intensity;
+      spotLight.intensity -= settings.spikeValue;
+      settings.spike = true;
+    }
+    if (settings.spike && Math.random() > 0.3) {
+      spotLight.intensity += settings.spikeValue;
+      settings.spike = false;
+    }
+
+    spotLight.intensity -= Math.random()/100;
+
     spotLight.target.position.y = controls.getPitchObject().rotation.x+0.35;
 
     controls.update(Date.now() - time);
@@ -190,7 +204,7 @@ $(function($) {
 
   // plane geo
   function getPlane() {
-    var geometry = new THREE.PlaneGeometry(tileSize, tileSize, 10, 10);
+    var geometry = new THREE.PlaneGeometry(tileSize, tileSize, 5, 5);
     var material = new THREE.MeshPhongMaterial({
       map: textures.wallTexture
     });
