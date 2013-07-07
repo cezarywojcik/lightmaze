@@ -39,7 +39,7 @@ function mazegen(rows,cols) {
 function makePath(point, count, prob) {
   var x = point.x;
   var y = point.y;
-  var last = point;
+  last = point;
   maze[x][y].wall = false;
   if (count < prob) {
     var neighbors = getNeighbors(point);
