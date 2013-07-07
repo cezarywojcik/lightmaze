@@ -1,9 +1,11 @@
 body {
   margin: 0;
   padding: 0;
+  font-family: sans-serif;
 }
 
 #menu {
+  color: #ffffff;
   position: absolute;
   margin-left: 0;
   margin-top: 0;
@@ -20,4 +22,18 @@ body {
   top: 44%;
   width: 22%;
   height: 22%;
+  cursor: pointer;
+}
+
+#play:hover {
+  font-size: 90px;
+}
+
+h1 {
+  margin-left: 40px;
+  font-size: 128px;
+}
+
+h2 {
+  font-size: 80px;
 }

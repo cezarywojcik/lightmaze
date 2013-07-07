@@ -4,9 +4,9 @@ var settings = {
     spikeValue: 0,
     endGame: false,
     lightOn: true,
-	started: false
+    started: false
   };
-  
+
 var controls;
 
 $(function($) {
@@ -25,7 +25,7 @@ $(function($) {
 
   var objects = [];
 
-  
+
 
   var back = new Audio('res/aud/back.ogg');
   back.preload = 'auto';
@@ -46,16 +46,16 @@ $(function($) {
 
   document.addEventListener("click", function(e) {
     if(!settings.started)
-	  playGame();
+      playGame();
   });
-  
+
   $(window).keypress(function(e) {
        var key = e.keyCode;
-       
-	   if(key == 13 && settings.started)
-	     pauseGame();
+
+       if(key == 13 && settings.started)
+         pauseGame();
    });
-   
+
   function loadTexture(image) {
     var texture = new THREE.ImageUtils.loadTexture(image,
       new THREE.UVMapping(), function() {
@@ -153,8 +153,8 @@ $(function($) {
         spotLight.intensity -= settings.spikeValue;
         settings.spike = true;
       }
-	  
-	  if(settings.started)
+
+      if(settings.started)
         spotLight.intensity -= Math.random()/150;
     }
 
@@ -244,90 +244,87 @@ function giveGameFocus(giveFocus){
 
   if(giveFocus) {
     var havePointerLock = 'pointerLockElement' in document ||
-	'mozPointerLockElement' in document ||
-	'webkitPointerLockElement' in document;
+    'mozPointerLockElement' in document ||
+    'webkitPointerLockElement' in document;
 
-	if (havePointerLock) {
+    if (havePointerLock) {
       var element = document.body;
-	  var pointerlockchange = function ( event ) {
+      var pointerlockchange = function ( event ) {
         if ( document.pointerLockElement === element ||
           document.mozPointerLockElement === element ||
-	      document.webkitPointerLockElement === element ) {
-	      controls.enabled = true;
-	    } else {
-	      controls.enabled = false;
-		  instructions.style.display = '';
-	    }
-	  };
+          document.webkitPointerLockElement === element ) {
+          controls.enabled = true;
+        } else {
+          controls.enabled = false;
+          instructions.style.display = '';
+        }
+      };
     }
 
-		var pointerlockerror = function ( event ) {
-		  instructions.style.display = '';
-		};
+        var pointerlockerror = function ( event ) {
+          instructions.style.display = '';
+        };
 
-		// Hook pointer lock state change events
-		document.addEventListener( 'pointerlockchange',
-		  pointerlockchange, false );
-		document.addEventListener( 'mozpointerlockchange',
-		  pointerlockchange, false );
-		document.addEventListener( 'webkitpointerlockchange',
-		  pointerlockchange, false );
+        // Hook pointer lock state change events
+        document.addEventListener('pointerlockchange',
+          pointerlockchange, false);
+        document.addEventListener( 'mozpointerlockchange',
+          pointerlockchange, false);
+        document.addEventListener( 'webkitpointerlockchange',
+          pointerlockchange, false);
 
-		document.addEventListener('pointerlockerror',
-		  pointerlockerror, false);
-		document.addEventListener('mozpointerlockerror',
-		  pointerlockerror, false);
-		document.addEventListener('webkitpointerlockerror',
-		  pointerlockerror, false )
-		// Ask the browser to lock the pointer
-		element.requestPointerLock = element.requestPointerLock ||
-		  element.mozRequestPointerLock || element.webkitRequestPointerLock;
+        document.addEventListener('pointerlockerror',
+          pointerlockerror, false);
+        document.addEventListener('mozpointerlockerror',
+          pointerlockerror, false);
+        document.addEventListener('webkitpointerlockerror',
+          pointerlockerror, false)
+        // Ask the browser to lock the pointer
+        element.requestPointerLock = element.requestPointerLock ||
+          element.mozRequestPointerLock || element.webkitRequestPointerLock;
 
-		if (/Firefox/i.test( navigator.userAgent)) {
-		  var fullscreenchange = function (event) {
-			if ( document.fullscreenElement === element ||
-			  document.mozFullscreenElement === element ||
-			  document.mozFullScreenElement === element ) {
-/*
-			  document.removeEventListener('fullscreenchange',
-				fullscreenchange );
-			  document.removeEventListener('mozfullscreenchange',
-				fullscreenchange );*/
-			  element.requestPointerLock();
-			  
-			}
-			
-			else if(document.cancelFullScreen || document.mozCancelFullScreen || document.webkitCancelFullScreen)
-			    pauseGame();
-		};
+        if (/Firefox/i.test( navigator.userAgent)) {
+          var fullscreenchange = function (event) {
+            if ( document.fullscreenElement === element ||
+              document.mozFullscreenElement === element ||
+              document.mozFullScreenElement === element ) {
+              element.requestPointerLock();
 
-		document.addEventListener( 'fullscreenchange',
-		  fullscreenchange, false );
-		document.addEventListener( 'mozfullscreenchange',
-		  fullscreenchange, false );
+            }
 
-		element.requestFullscreen = element.requestFullscreen ||
-		  element.mozRequestFullscreen || element.mozRequestFullScreen ||
-		  element.webkitRequestFullscreen;
+            else if(document.cancelFullScreen ||
+              document.mozCancelFullScreen ||
+              document.webkitCancelFullScreen)
+                pauseGame();
+        };
 
-		element.requestFullscreen();
+        document.addEventListener( 'fullscreenchange',
+          fullscreenchange, false );
+        document.addEventListener( 'mozfullscreenchange',
+          fullscreenchange, false );
 
-		} else {
-		element.requestPointerLock();
-		} 
-	}
-	
-	else{
-	  if (document.exitFullscreen) {
-	    document.exitFullscreen();
-	  }
-	  else if (document.mozCancelFullScreen) {
-	    document.mozCancelFullScreen();
-	  }
-	  else if (document.webkitCancelFullScreen) {
-	    document.webkitCancelFullScreen();
-	  }
-	}
+        element.requestFullscreen = element.requestFullscreen ||
+          element.mozRequestFullscreen || element.mozRequestFullScreen ||
+          element.webkitRequestFullscreen;
+
+        element.requestFullscreen();
+
+        } else {
+          element.requestPointerLock();
+        }
+    }
+
+    else{
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+      else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      }
+      else if (document.webkitCancelFullScreen) {
+        document.webkitCancelFullScreen();
+      }
+    }
   }
 
 
