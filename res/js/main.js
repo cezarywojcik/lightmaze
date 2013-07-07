@@ -146,7 +146,7 @@ $(function($) {
 
     var tilePoint = getTile(controls.getObject());
 
-    if (spoitLight.intensity < 0) {
+    if (spotLight.intensity < 0) {
       // end game
     }
 
