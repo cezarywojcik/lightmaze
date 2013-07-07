@@ -73,7 +73,9 @@ function pathing(x, y, enterdir, pathcount) {
   var rightpathed = maze[x + 1][y].pathed;
 
   //dead-end check
-  if ((upblocked || uppathed) && (downblocked || downpathed) && (leftblocked || leftpathed) && (rightblocked || rightpathed) || (pathcount > deadthresh && Math.random() < 0.20)) {
+  if ((upblocked || uppathed) && (downblocked || downpathed) && (leftblocked ||
+   leftpathed) && (rightblocked || rightpathed) || (pathcount > deadthresh &&
+   Math.random() < 0.20)) {
     deadends.push([x, y, pathcount]);
   } else {
 
@@ -106,7 +108,9 @@ function pathing(x, y, enterdir, pathcount) {
         }
       }
     }
-    while (Math.random() < 0.2 && !((upblocked || uppathed) && (downblocked || downpathed) && (leftblocked || leftpathed) && (rightblocked || rightpathed)));
+    while (Math.random() < 0.2 && !((upblocked || uppathed) && (downblocked ||
+      downpathed) && (leftblocked || leftpathed) && (rightblocked ||
+      rightpathed)));
   }
 
   if (!uppathed) {
