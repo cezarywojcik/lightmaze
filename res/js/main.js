@@ -10,6 +10,10 @@ var settings = {
 var controls;
 
 $(function($) {
+
+  // get maze object
+  mazeObject = mazegen(20,20);
+
   // vars
   var el, renderer, camera, scene, cube, spotLight, dirLight;
 
@@ -25,7 +29,13 @@ $(function($) {
 
   var objects = [];
 
-
+  var getTile = function(camera) {
+    var x = camera.position.x;
+    var y = camera.position.z;
+    var newx = Math.floor(x/tileSize);
+    var newy = Math.floor(y/tileSize);
+    return {x: newx, y: newy};
+  };
 
   var back = new Audio('res/aud/back.ogg');
   back.preload = 'auto';
@@ -83,9 +93,6 @@ $(function($) {
     // scene
     scene = new THREE.Scene();
 
-    // get maze object
-    mazeObject = mazegen(20,20);
-
     // camera
     camera = new THREE.PerspectiveCamera(60,
           window.innerWidth/(window.innerHeight), 0.1, 10000);
@@ -94,7 +101,6 @@ $(function($) {
     controls = new THREE.PointerLockControls(camera, mazeObject);
     controls.getObject().position.x = tileSize;
     controls.getObject().position.z = tileSize;
-    controls.enabled = false;
     scene.add(controls.getObject());
 
     // start location
@@ -138,7 +144,13 @@ $(function($) {
       settings.spike = false;
     }
 
-    if (spotLight.intensity < 0) {
+    var tilePoint = getTile(controls.getObject());
+
+    if (spoitLight.intensity < 0) {
+      // end game
+    }
+
+    if (tilePoint.x === mazeObject.end.x && tilePoint.y === mazeObject.end.y) {
       settings.endGame = true;
       spotLight.angle = Math.PI/2;
     }
