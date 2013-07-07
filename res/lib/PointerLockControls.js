@@ -111,6 +111,10 @@ THREE.PointerLockControls = function (camera) {
 
   };
 
+  this.getPitchObject = function () {
+  	return pitchObject;
+  }
+
   this.isOnObject = function (boolean) {
 
     isOnObject = boolean;

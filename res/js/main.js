@@ -37,7 +37,7 @@ var sample = {
 
 $(function($) {
   // vars
-  var el, renderer, camera, scene, cube, spotLight, controls, ray;
+  var el, renderer, camera, scene, cube, spotLight, controls, ray, dirLight;
 
   var mazeObject;
 
@@ -51,11 +51,15 @@ $(function($) {
 
   var objects = [];
 
+  var settings = {
+    lightIntensity: 1
+  };
+
   // texture
   // var wallTexture = new THREE.ImageUtils.loadTexture('res/img/wall.png',
   //   new THREE.UVMapping(), function() {
   //     init();
-  //   });
+  // });
   // wallTexture.needsUpdate = true;
 
   function init() {
@@ -63,7 +67,7 @@ $(function($) {
 
     // renderer
     renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight-4);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     el.html(renderer.domElement);
 
     // scene
@@ -71,7 +75,7 @@ $(function($) {
 
     // camera
     camera = new THREE.PerspectiveCamera(60,
-          window.innerWidth/(window.innerHeight-4), 0.1, 5000);
+          window.innerWidth/(window.innerHeight), 0.1, 10000);
     camera.position.y = tileSize/2;
 
     // controls
@@ -80,24 +84,27 @@ $(function($) {
     controls.getObject().position.z = tileSize;
     controls.enabled = true;
     scene.add(controls.getObject());
+    console.log(controls.getObject().rotation);
 
     // spot light
-    spotLight = new THREE.SpotLight(0xffffff);
-    // spotLight.castShadow = true;
-    // spotLight.shadowMapWidth = 1024;
-    // spotLight.shadowMapHeight = 1024;
-    // spotLight.shadowCameraNear = 500;
-    // spotLight.shadowCameraFar = 4000;
-    // spotLight.shadowCameraFov = 60;
-    spotLight.target.position.set(0, 0, -1);
+    spotLight = new THREE.SpotLight(0xffffff, settings.lightIntensity,
+      tileSize*4);
+    spotLight.angle = Math.PI/5;
+    spotLight.exponent = 50;
+    spotLight.target.position.set(0, controls.getPitchObject().rotation.x, -1);
     controls.getObject().add(spotLight.target);
     spotLight.position = controls.getObject().position;
     scene.add(spotLight);
 
+    // directional light
+    dirLight = new THREE.DirectionalLight(0x000000, 1);
+    dirLight.target.position.set(0, 1, 0);
+    scene.add(dirLight);
+
     // ray caster
     ray = new THREE.Raycaster();
 
-    // object
+    // get maze object
     mazeObject = sample;
 
     // add maze.
@@ -111,10 +118,7 @@ $(function($) {
   function render() {
     renderer.render(scene, camera);
 
-    ray.ray.origin.copy(controls.getObject().position);
-    var intersections = ray.intersectObjects(objects);
-    if (intersections.length > 0) {
-    }
+    spotLight.target.position.y = controls.getPitchObject().rotation.x+0.3;
 
     controls.update(Date.now() - time);
 
@@ -126,8 +130,8 @@ $(function($) {
   // plane geo
   function getPlane() {
     var geometry = new THREE.PlaneGeometry(tileSize, tileSize, 100, 100);
-    var material = new THREE.MeshLambertMaterial({
-      color: 0xff0000
+    var material = new THREE.MeshPhongMaterial({
+      color: 0x660000
     });
     var result = new THREE.Mesh(geometry, material);
     result.overdraw = true;
@@ -137,31 +141,36 @@ $(function($) {
 
   // add maze meshes from mazeObject
   function addMaze() {
-    // floor
     var width = mazeObject.cols*tileSize;
     var height = mazeObject.rows*tileSize;
-    var floorGeo = new THREE.PlaneGeometry(width, height,
-      mazeObject.cols, mazeObject.rows);
-    var floorMat = new THREE.MeshLambertMaterial({
-      color: 0x00ff00
-    });
-    var floor = new THREE.Mesh(floorGeo, floorMat);
-    floor.rotation.x = 3*Math.PI/2;
-    floor.position.x = tileSize;
-    floor.position.z = tileSize;
-    scene.add(floor);
-    objects.push(floor);
     // ceiling
-    var ceilingMat = new THREE.MeshLambertMaterial({
+    var ceilingGeo = new THREE.PlaneGeometry(width, height,
+      mazeObject.cols*100, mazeObject.rows*100);
+    var ceilingMat = new THREE.MeshPhongMaterial({
       color: 0x0000ff
     });
-    var ceiling = new THREE.Mesh(floorGeo, ceilingMat);
+    var ceiling = new THREE.Mesh(ceilingGeo, ceilingMat);
     ceiling.position.y = tileSize;
     ceiling.rotation.x = Math.PI/2;
     ceiling.position.x = tileSize;
     ceiling.position.z = tileSize;
     scene.add(ceiling);
     objects.push(ceiling);
+    // ceiling
+    var groundGeo = new THREE.PlaneGeometry(width, height,
+      mazeObject.cols*100, mazeObject.rows*100);
+    var groundMat = new THREE.MeshPhongMaterial({
+      color: 0xff0000,
+      ambient: 0x000000,
+      specular: 0x000000
+    });
+    var ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.position.y = 0;
+    ground.rotation.x = 3*Math.PI/2;
+    ground.position.x = tileSize;
+    ground.position.z = tileSize;
+    scene.add(ground);
+    objects.push(ground);
     // add walls
     var maze = mazeObject.maze;
     for (var i = 0; i < mazeObject.cols; i++) {
@@ -207,9 +216,9 @@ $(function($) {
 
   // resize handler
   $(window).resize(function() {
-    camera.aspect = window.innerWidth/(window.innerHeight-4);
+    camera.aspect = window.innerWidth/(window.innerHeight);
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight-4);
+    renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
   init();
