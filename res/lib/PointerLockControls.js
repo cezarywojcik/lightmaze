@@ -34,6 +34,8 @@ THREE.PointerLockControls = function (camera, mazeObject) {
 
   var PI_2 = Math.PI / 2;
 
+  this.enabled = false;
+
   var getTile = function(camera) {
     var x = camera.position.x;
     var y = camera.position.z;
@@ -134,8 +136,6 @@ THREE.PointerLockControls = function (camera, mazeObject) {
   document.addEventListener('mousemove', onMouseMove, false);
   document.addEventListener('keydown', onKeyDown, false);
   document.addEventListener('keyup', onKeyUp, false);
-
-  this.enabled = false;
 
   this.getObject = function () {
     return yawObject;

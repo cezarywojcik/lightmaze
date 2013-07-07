@@ -84,6 +84,7 @@ $(function($) {
 
   function init() {
     el = $(selector);
+    el.attr('tabindex', '0');
 
     // renderer
     renderer = new THREE.WebGLRenderer();
@@ -159,15 +160,19 @@ $(function($) {
       spotLight.intensity += Math.random();
       spotLight.exponent -= Math.random();
       spotLight.distance = 20000;
-    } else  if (settings.lightOn) {
+      if (spotLight.exponent < 10) {
+        // restart
+        document.location.reload(true);
+      }
+    } else if (settings.lightOn) {
       if (!settings.spike && Math.random() > 0.95) {
         settings.spikeValue = Math.random()*spotLight.intensity;
         spotLight.intensity -= settings.spikeValue;
         settings.spike = true;
       }
-
-      if(settings.started)
-        spotLight.intensity -= Math.random()/200;
+      if(settings.started) {
+        spotLight.intensity -= Math.random()/180;
+      }
     }
 
     spotLight.target.position.y = controls.getPitchObject().rotation.x;
