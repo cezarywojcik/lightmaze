@@ -1,6 +1,6 @@
 $(function($) {
   // vars
-  var el, renderer, camera, scene, cube, spotLight, controls, ray, dirLight;
+  var el, renderer, camera, scene, cube, spotLight, controls, dirLight;
 
   var mazeObject;
 
@@ -21,6 +21,12 @@ $(function($) {
     endGame: false,
     lightOn: true
   };
+
+  var back = new Audio('res/aud/back.ogg');
+  back.preload = 'auto';
+  back.loop = true;
+  back.volume = 0.3;
+  back.play();
 
   var havePointerLock = 'pointerLockElement' in document ||
   'mozPointerLockElement' in document ||
@@ -100,6 +106,9 @@ $(function($) {
     // cant pointer lock
   }
 
+  // var prevcam
+  var prevCam = new THREE.Vector3();
+
   // textures
   var numTexturesLoaded = 0;
   var textures = {
@@ -142,7 +151,7 @@ $(function($) {
           window.innerWidth/(window.innerHeight), 0.1, 10000);
 
     // controls
-    controls = new THREE.PointerLockControls(camera);
+    controls = new THREE.PointerLockControls(camera, mazeObject);
     controls.getObject().position.x = tileSize;
     controls.getObject().position.z = tileSize;
     controls.enabled = true;
@@ -169,8 +178,8 @@ $(function($) {
     spotLight.position = controls.getObject().position;
     scene.add(spotLight);
 
-    // ray caster
-    ray = new THREE.Raycaster();
+    // prevcam
+    prevCam.copy(controls.getObject().position);
 
     // add maze.
     addMaze();
@@ -182,6 +191,8 @@ $(function($) {
   // render
   function render() {
     renderer.render(scene, camera);
+    prevCam.copy(controls.getObject().position);
+
     if (settings.spike && Math.random() > 0.4) {
       spotLight.intensity += settings.spikeValue;
       settings.spike = false;
