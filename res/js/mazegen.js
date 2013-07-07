@@ -9,7 +9,7 @@ function mazegen(rows, cols) {
   var maxheight = rows - 1; //counting 0
   var maxwidth = cols - 1;
 
-  deadthresh = Math.ceil((rows + cols) * 0.7);
+  deadthresh = Math.ceil((rows + cols) * 0.5);
 
   for (var i = 0; i <= maxheight; i++) { //rows
 
@@ -85,9 +85,7 @@ function pathing(x, y, enterdir, pathcount) {
   var rightpathed = maze[x + 1][y].pathed;
 
   //dead-end check
-  if ((upblocked || uppathed) && (downblocked || downpathed) && (leftblocked ||
-   leftpathed) && (rightblocked || rightpathed) || (pathcount > deadthresh &&
-   Math.random() < 0.20)) {
+  if (((upblocked || uppathed) && (downblocked || downpathed) && (leftblocked || leftpathed) && (rightblocked || rightpathed)) || (pathcount > deadthresh && Math.random() < 0.20)) {
     deadends.push([x, y, pathcount]);
   } else {
 
