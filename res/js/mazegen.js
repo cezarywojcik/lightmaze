@@ -8,7 +8,7 @@ function mazegen(rows,cols) {
   var maxheight = rows - 1; //counting 0
   var maxwidth = cols - 1;
 
-  deadthresh = Math.ceil((rows * cols)*0.15);
+  deadthresh = Math.ceil((rows + cols)*0.7);
 
   for (var i = 0; i <= maxheight; i++) { //rows
 
@@ -35,7 +35,6 @@ function mazegen(rows,cols) {
 
   //force the start point to open upward
   maze[start.x][start.y] = {
-  wall: false,
   pathed: true,
   isInSolution: true
   };
@@ -69,73 +68,53 @@ function pathing(x, y, enterdir, pathcount) {
   var leftpathed = maze[x-1][y].pathed;
   var rightpathed = maze[x+1][y].pathed;
 
-  switch(enterdir) {
-    case "up":
-      downblocked = true;
-      break;
-    case "down":
-      upblocked = true;
-      break;
-    case "left":
-      rightblocked = true;
-      break;
-    case "right":
-      leftblocked = true;
-      break;
-  }
-
   //dead-end check
-  if ((upblocked && downblocked && leftblocked && rightblocked)/* || (pathcount > deadthresh && Math.random() < 0.25)*/) {
+  if ((upblocked||uppathed) && (downblocked||downpathed) && (leftblocked||leftpathed) && (rightblocked||rightpathed) || (pathcount > deadthresh && Math.random() < 0.20)) {
     deadends.push([x, y, pathcount]);
   } else {
 
     do {
 
-      var dirpool = [];
+      var exitdir = Math.random() * 4;
 
-      if (!upblocked && !uppathed) {
-        dirpool.push("up");
+      while (1) {
+        if (exitdir < 1 && !upblocked && !uppathed) {
+          uppathed = true;
+          pathing(x, y-1, "up", pathcount+1);
+          break;
+        } else if (exitdir < 2 && !downblocked && !downpathed) {
+          downpathed = true;
+          pathing(x, y+1, "down", pathcount+1);
+          break;
+        } else if (exitdir < 3 && !leftblocked && !leftpathed) {
+          leftpathed = true;
+          pathing(x-1, y, "left", pathcount+1);
+          break;
+        } else if (!rightblocked && !rightpathed) {
+          rightpathed = true;
+          pathing(x+1, y, "right", pathcount+1);
+          break;
+        } else {
+          exitdir += 1;
+          if (exitdir > 4) {
+            exitdir -= 4;
+          }
+        }
       }
-      if (!downblocked && !downpathed) {
-        dirpool.push("down");
-      }
-      if (!leftblocked && !leftpathed) {
-        dirpool.push("left");
-      }
-      if (!rightblocked && !rightpathed) {
-        dirpool.push("right");
-      }
-
-      var exitdir = dirpool[Math.floor(Math.random()*dirpool.length)];
-
-      //while (1) {
-      if (exitdir === "up") {
-        uppathed = true;
-        pathing(x, y-1, "up", pathcount+1);
-      } else if (exitdir === "down") {
-        downpathed = true;
-        pathing(x, y+1, "down", pathcount+1);
-      } else if (exitdir === "left") {
-        leftpathed = true;
-        pathing(x-1, y, "left", pathcount+1);
-      } else {
-        rightpathed = true;
-        pathing(x+1, y, "right", pathcount+1);
-      }
-
-    } while (0 && Math.random() < 0.25 && !((upblocked||uppathed) && (downblocked||downpathed) && (leftblocked||leftpathed) && (rightblocked||rightpathed)));
+    }
+    while (Math.random() < 0.2 && !((upblocked||uppathed) && (downblocked||downpathed) && (leftblocked||leftpathed) && (rightblocked||rightpathed)));
   }
 
-  if (!uppathed && enterdir != "down") {
+  if (!uppathed) {
     maze[x][y-1].wall = true;
   }
-  if (!downpathed && enterdir != "up") {
+  if (!downpathed) {
     maze[x][y+1].wall = true;
   }
-  if (!leftpathed && enterdir != "right") {
+  if (!leftpathed) {
     maze[x-1][y].wall = true;
   }
-  if (!rightpathed && enterdir != "left") {
+  if (!rightpathed) {
     maze[x+1][y].wall = true;
   }
 }
