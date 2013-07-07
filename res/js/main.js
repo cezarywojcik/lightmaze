@@ -1,6 +1,17 @@
+var settings = {
+    lightIntensity: 10,
+    spike: false,
+    spikeValue: 0,
+    endGame: false,
+    lightOn: true,
+	started: false
+  };
+  
+var controls;
+
 $(function($) {
   // vars
-  var el, renderer, camera, scene, cube, spotLight, controls, dirLight;
+  var el, renderer, camera, scene, cube, spotLight, dirLight;
 
   var mazeObject;
 
@@ -14,13 +25,7 @@ $(function($) {
 
   var objects = [];
 
-  var settings = {
-    lightIntensity: 10,
-    spike: false,
-    spikeValue: 0,
-    endGame: false,
-    lightOn: true
-  };
+  
 
   var back = new Audio('res/aud/back.ogg');
   back.preload = 'auto';
@@ -28,83 +33,6 @@ $(function($) {
   back.volume = 0.3;
   back.play();
 
-  var havePointerLock = 'pointerLockElement' in document ||
-  'mozPointerLockElement' in document ||
-  'webkitPointerLockElement' in document;
-
-  if (havePointerLock) {
-    var element = document.body;
-    var pointerlockchange = function ( event ) {
-      if ( document.pointerLockElement === element ||
-        document.mozPointerLockElement === element ||
-        document.webkitPointerLockElement === element ) {
-        controls.enabled = true;
-        blocker.style.display = 'none';
-      } else {
-        controls.enabled = false;
-        blocker.style.display = '-webkit-box';
-        blocker.style.display = '-moz-box';
-        blocker.style.display = 'box';
-        instructions.style.display = '';
-      }
-    };
-
-    var pointerlockerror = function ( event ) {
-      instructions.style.display = '';
-    };
-
-    // Hook pointer lock state change events
-    document.addEventListener( 'pointerlockchange',
-      pointerlockchange, false );
-    document.addEventListener( 'mozpointerlockchange',
-      pointerlockchange, false );
-    document.addEventListener( 'webkitpointerlockchange',
-      pointerlockchange, false );
-
-    document.addEventListener('pointerlockerror',
-      pointerlockerror, false);
-    document.addEventListener('mozpointerlockerror',
-      pointerlockerror, false);
-    document.addEventListener('webkitpointerlockerror',
-      pointerlockerror, false );
-
-    document.addEventListener('click', function ( event ) {
-      // Ask the browser to lock the pointer
-      element.requestPointerLock = element.requestPointerLock ||
-        element.mozRequestPointerLock || element.webkitRequestPointerLock;
-
-      if (/Firefox/i.test( navigator.userAgent)) {
-        var fullscreenchange = function (event) {
-          if ( document.fullscreenElement === element ||
-            document.mozFullscreenElement === element ||
-            document.mozFullScreenElement === element ) {
-
-            document.removeEventListener('fullscreenchange',
-              fullscreenchange );
-            document.removeEventListener('mozfullscreenchange',
-              fullscreenchange );
-            element.requestPointerLock();
-          }
-        };
-
-        document.addEventListener( 'fullscreenchange',
-          fullscreenchange, false );
-        document.addEventListener( 'mozfullscreenchange',
-          fullscreenchange, false );
-
-        element.requestFullscreen = element.requestFullscreen ||
-          element.mozRequestFullscreen || element.mozRequestFullScreen ||
-          element.webkitRequestFullscreen;
-
-        element.requestFullscreen();
-
-      } else {
-        element.requestPointerLock();
-      }
-    }, false );
-  } else {
-    // cant pointer lock
-  }
 
   // var prevcam
   var prevCam = new THREE.Vector3();
@@ -116,6 +44,18 @@ $(function($) {
     ceilingTexture: loadTexture('res/img/ceiling.png')
   };
 
+  document.addEventListener("click", function(e) {
+    if(!settings.started)
+	  playGame();
+  });
+  
+  $(window).keypress(function(e) {
+       var key = e.keyCode;
+       
+	   if(key == 13 && settings.started)
+	     pauseGame();
+   });
+   
   function loadTexture(image) {
     var texture = new THREE.ImageUtils.loadTexture(image,
       new THREE.UVMapping(), function() {
@@ -154,7 +94,7 @@ $(function($) {
     controls = new THREE.PointerLockControls(camera, mazeObject);
     controls.getObject().position.x = tileSize;
     controls.getObject().position.z = tileSize;
-    controls.enabled = true;
+    controls.enabled = false;
     scene.add(controls.getObject());
 
     // start location
@@ -213,7 +153,9 @@ $(function($) {
         spotLight.intensity -= settings.spikeValue;
         settings.spike = true;
       }
-      spotLight.intensity -= Math.random()/150;
+	  
+	  if(settings.started)
+        spotLight.intensity -= Math.random()/150;
     }
 
     spotLight.target.position.y = controls.getPitchObject().rotation.x;
@@ -285,3 +227,108 @@ $(function($) {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 });
+
+function playGame() {
+  giveGameFocus(true);
+  $("#menu").fadeOut();
+  settings.started = true;
+}
+
+function pauseGame() {
+  giveGameFocus(false);
+  $("#menu").fadeIn();
+  settings.started = false;
+}
+
+function giveGameFocus(giveFocus){
+
+  if(giveFocus) {
+    var havePointerLock = 'pointerLockElement' in document ||
+	'mozPointerLockElement' in document ||
+	'webkitPointerLockElement' in document;
+
+	if (havePointerLock) {
+      var element = document.body;
+	  var pointerlockchange = function ( event ) {
+        if ( document.pointerLockElement === element ||
+          document.mozPointerLockElement === element ||
+	      document.webkitPointerLockElement === element ) {
+	      controls.enabled = true;
+	    } else {
+	      controls.enabled = false;
+		  instructions.style.display = '';
+	    }
+	  };
+    }
+
+		var pointerlockerror = function ( event ) {
+		  instructions.style.display = '';
+		};
+
+		// Hook pointer lock state change events
+		document.addEventListener( 'pointerlockchange',
+		  pointerlockchange, false );
+		document.addEventListener( 'mozpointerlockchange',
+		  pointerlockchange, false );
+		document.addEventListener( 'webkitpointerlockchange',
+		  pointerlockchange, false );
+
+		document.addEventListener('pointerlockerror',
+		  pointerlockerror, false);
+		document.addEventListener('mozpointerlockerror',
+		  pointerlockerror, false);
+		document.addEventListener('webkitpointerlockerror',
+		  pointerlockerror, false )
+		// Ask the browser to lock the pointer
+		element.requestPointerLock = element.requestPointerLock ||
+		  element.mozRequestPointerLock || element.webkitRequestPointerLock;
+
+		if (/Firefox/i.test( navigator.userAgent)) {
+		  var fullscreenchange = function (event) {
+			if ( document.fullscreenElement === element ||
+			  document.mozFullscreenElement === element ||
+			  document.mozFullScreenElement === element ) {
+/*
+			  document.removeEventListener('fullscreenchange',
+				fullscreenchange );
+			  document.removeEventListener('mozfullscreenchange',
+				fullscreenchange );*/
+			  element.requestPointerLock();
+			  
+			}
+			
+			else if(document.cancelFullScreen || document.mozCancelFullScreen || document.webkitCancelFullScreen)
+			    pauseGame();
+		};
+
+		document.addEventListener( 'fullscreenchange',
+		  fullscreenchange, false );
+		document.addEventListener( 'mozfullscreenchange',
+		  fullscreenchange, false );
+
+		element.requestFullscreen = element.requestFullscreen ||
+		  element.mozRequestFullscreen || element.mozRequestFullScreen ||
+		  element.webkitRequestFullscreen;
+
+		element.requestFullscreen();
+
+		} else {
+		element.requestPointerLock();
+		} 
+	}
+	
+	else{
+	  if (document.exitFullscreen) {
+	    document.exitFullscreen();
+	  }
+	  else if (document.mozCancelFullScreen) {
+	    document.mozCancelFullScreen();
+	  }
+	  else if (document.webkitCancelFullScreen) {
+	    document.webkitCancelFullScreen();
+	  }
+	}
+  }
+
+
+
