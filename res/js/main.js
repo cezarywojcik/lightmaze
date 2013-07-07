@@ -1,40 +1,3 @@
-var sample = {
-  start: {x:0, y:0},
-  end: {x:2, y:2},
-  cols: 2,
-  rows: 2,
-  maze: [
-    [
-      {
-        up: true,
-        down: false,
-        left: true,
-        right: false
-      },
-      {
-        up: true,
-        down: false,
-        left: false,
-        right: true
-      }
-    ],
-    [
-      {
-        up: false,
-        down: true,
-        left: true,
-        right: false
-      },
-      {
-        up: false,
-        down: true,
-        left: false,
-        right: true
-      }
-    ]
-  ]
-};
-
 $(function($) {
   // vars
   var el, renderer, camera, scene, cube, spotLight, controls, ray, dirLight;
@@ -55,12 +18,106 @@ $(function($) {
     lightIntensity: 1
   };
 
-  // texture
-  // var wallTexture = new THREE.ImageUtils.loadTexture('res/img/wall.png',
-  //   new THREE.UVMapping(), function() {
-  //     init();
-  // });
-  // wallTexture.needsUpdate = true;
+  var havePointerLock = 'pointerLockElement' in document ||
+  'mozPointerLockElement' in document ||
+  'webkitPointerLockElement' in document;
+
+  if (havePointerLock) {
+    var element = document.body;
+    var pointerlockchange = function ( event ) {
+      if ( document.pointerLockElement === element ||
+        document.mozPointerLockElement === element ||
+        document.webkitPointerLockElement === element ) {
+        controls.enabled = true;
+        blocker.style.display = 'none';
+      } else {
+        controls.enabled = false;
+        blocker.style.display = '-webkit-box';
+        blocker.style.display = '-moz-box';
+        blocker.style.display = 'box';
+        instructions.style.display = '';
+      }
+    };
+
+    var pointerlockerror = function ( event ) {
+      instructions.style.display = '';
+    };
+
+    // Hook pointer lock state change events
+    document.addEventListener( 'pointerlockchange',
+      pointerlockchange, false );
+    document.addEventListener( 'mozpointerlockchange',
+      pointerlockchange, false );
+    document.addEventListener( 'webkitpointerlockchange',
+      pointerlockchange, false );
+
+    document.addEventListener('pointerlockerror',
+      pointerlockerror, false);
+    document.addEventListener('mozpointerlockerror',
+      pointerlockerror, false);
+    document.addEventListener('webkitpointerlockerror',
+      pointerlockerror, false );
+
+    document.addEventListener('click', function ( event ) {
+      // Ask the browser to lock the pointer
+      element.requestPointerLock = element.requestPointerLock ||
+        element.mozRequestPointerLock || element.webkitRequestPointerLock;
+
+      if (/Firefox/i.test( navigator.userAgent)) {
+        var fullscreenchange = function (event) {
+          if ( document.fullscreenElement === element ||
+            document.mozFullscreenElement === element ||
+            document.mozFullScreenElement === element ) {
+
+            document.removeEventListener('fullscreenchange',
+              fullscreenchange );
+            document.removeEventListener('mozfullscreenchange',
+              fullscreenchange );
+            element.requestPointerLock();
+          }
+        };
+
+        document.addEventListener( 'fullscreenchange',
+          fullscreenchange, false );
+        document.addEventListener( 'mozfullscreenchange',
+          fullscreenchange, false );
+
+        element.requestFullscreen = element.requestFullscreen ||
+          element.mozRequestFullscreen || element.mozRequestFullScreen ||
+          element.webkitRequestFullscreen;
+
+        element.requestFullscreen();
+
+      } else {
+        element.requestPointerLock();
+      }
+    }, false );
+  } else {
+    // cant pointer lock
+  }
+
+  // textures
+  var numTexturesLoaded = 0;
+  var textures = {
+    wallTexture: loadTexture('res/img/wall.png'),
+    ceilingTexture: loadTexture('res/img/ceiling.png')
+  };
+
+  function loadTexture(image) {
+    var texture = new THREE.ImageUtils.loadTexture(image,
+      new THREE.UVMapping(), function() {
+        textureLoaded();
+    });
+    texture.needsUpdate = true;
+    return texture;
+  }
+
+  function textureLoaded() {
+    numTexturesLoaded++;
+    if (numTexturesLoaded === Object.keys(textures).length) {
+      init();
+    }
+  }
 
   function init() {
     el = $(selector);
@@ -73,6 +130,9 @@ $(function($) {
     // scene
     scene = new THREE.Scene();
 
+    // get maze object
+    mazeObject = mazegen(5, 5);
+
     // camera
     camera = new THREE.PerspectiveCamera(60,
           window.innerWidth/(window.innerHeight), 0.1, 10000);
@@ -84,6 +144,10 @@ $(function($) {
     controls.getObject().position.z = tileSize;
     controls.enabled = true;
     scene.add(controls.getObject());
+
+    // start location
+    controls.getObject().position.x = mazeObject.start.x*tileSize+tileSize/2;
+    controls.getObject().position.z = mazeObject.start.y*tileSize+tileSize/2;
 
     // spot light
     spotLight = new THREE.SpotLight(0xffffff, settings.lightIntensity,
@@ -104,9 +168,6 @@ $(function($) {
     // ray caster
     ray = new THREE.Raycaster();
 
-    // get maze object
-    mazeObject = mazegen(4, 4);
-
     // add maze.
     addMaze();
 
@@ -118,7 +179,7 @@ $(function($) {
   function render() {
     renderer.render(scene, camera);
 
-    spotLight.target.position.y = controls.getPitchObject().rotation.x+0.3;
+    spotLight.target.position.y = controls.getPitchObject().rotation.x+0.35;
 
     controls.update(Date.now() - time);
 
@@ -129,9 +190,9 @@ $(function($) {
 
   // plane geo
   function getPlane() {
-    var geometry = new THREE.PlaneGeometry(tileSize, tileSize, 100, 100);
+    var geometry = new THREE.PlaneGeometry(tileSize, tileSize, 10, 10);
     var material = new THREE.MeshPhongMaterial({
-      color: 0x660000
+      map: textures.wallTexture
     });
     var result = new THREE.Mesh(geometry, material);
     result.overdraw = true;
@@ -145,12 +206,12 @@ $(function($) {
     for (var i = 0; i < mazeObject.cols; i++) {
       for (var j = 0; j < mazeObject.rows; j++) {
         var tile = maze[i][j];
-        var x = j;
-        var y = i;
+        var x = i;
+        var y = j;
         // ceiling
-        var ceilingGeo = new THREE.PlaneGeometry(tileSize, tileSize, 100, 100);
+        var ceilingGeo = new THREE.PlaneGeometry(tileSize, tileSize, 5, 5);
         var ceilingMat = new THREE.MeshPhongMaterial({
-          color: 0x0000ff
+          map: textures.ceilingTexture
         });
         var ceiling = new THREE.Mesh(ceilingGeo, ceilingMat);
         ceiling.rotation.x = Math.PI/2;
@@ -160,9 +221,9 @@ $(function($) {
         scene.add(ceiling);
         objects.push(ceiling);
         // ground
-        var groundGeo = new THREE.PlaneGeometry(tileSize, tileSize, 100, 100);
+        var groundGeo = new THREE.PlaneGeometry(tileSize, tileSize, 5, 5);
         var groundMat = new THREE.MeshPhongMaterial({
-          color: 0x00ff00
+          map: textures.ceilingTexture
         });
         var ground = new THREE.Mesh(groundGeo, groundMat);
         ground.rotation.x = 3*Math.PI/2;
@@ -214,6 +275,4 @@ $(function($) {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
-
-  init();
 });
