@@ -56,6 +56,7 @@ function mazegen(rows, cols) {
   var end = {};
   for (var v = 0; v<deadends.length; v++) {
     if (deadends[v][2] > greatest_dist) {
+      greatest_dist = deadends[v][2];
       end.x = deadends[v][0];
       end.y = deadends[v][1];
     }
