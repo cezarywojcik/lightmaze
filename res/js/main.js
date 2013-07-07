@@ -89,7 +89,7 @@ $(function($) {
     spotLight = new THREE.SpotLight(0xffffff, settings.lightIntensity,
       tileSize*4);
     spotLight.angle = Math.PI/4;
-    spotLight.exponent = 40;
+    spotLight.exponent = 30;
     spotLight.target.position.set(0, controls.getPitchObject().rotation.x, -1);
     controls.getObject().add(spotLight.target);
     spotLight.position = controls.getObject().position;
@@ -105,7 +105,7 @@ $(function($) {
     ray = new THREE.Raycaster();
 
     // get maze object
-    mazeObject = sample;
+    mazeObject = mazegen(4, 4);
 
     // add maze.
     addMaze();
@@ -141,43 +141,37 @@ $(function($) {
 
   // add maze meshes from mazeObject
   function addMaze() {
-    var width = mazeObject.cols*tileSize;
-    var height = mazeObject.rows*tileSize;
-    // ceiling
-    var ceilingGeo = new THREE.PlaneGeometry(width, height,
-      mazeObject.cols*100, mazeObject.rows*100);
-    var ceilingMat = new THREE.MeshPhongMaterial({
-      color: 0x0000ff
-    });
-    var ceiling = new THREE.Mesh(ceilingGeo, ceilingMat);
-    ceiling.position.y = tileSize;
-    ceiling.rotation.x = Math.PI/2;
-    ceiling.position.x = tileSize;
-    ceiling.position.z = tileSize;
-    scene.add(ceiling);
-    objects.push(ceiling);
-    // ceiling
-    var groundGeo = new THREE.PlaneGeometry(width, height,
-      mazeObject.cols*100, mazeObject.rows*100);
-    var groundMat = new THREE.MeshPhongMaterial({
-      color: 0xff0000,
-      ambient: 0x000000,
-      specular: 0x000000
-    });
-    var ground = new THREE.Mesh(groundGeo, groundMat);
-    ground.position.y = 0;
-    ground.rotation.x = 3*Math.PI/2;
-    ground.position.x = tileSize;
-    ground.position.z = tileSize;
-    scene.add(ground);
-    objects.push(ground);
-    // add walls
     var maze = mazeObject.maze;
     for (var i = 0; i < mazeObject.cols; i++) {
       for (var j = 0; j < mazeObject.rows; j++) {
         var tile = maze[i][j];
         var x = j;
         var y = i;
+        // ceiling
+        var ceilingGeo = new THREE.PlaneGeometry(tileSize, tileSize, 100, 100);
+        var ceilingMat = new THREE.MeshPhongMaterial({
+          color: 0x0000ff
+        });
+        var ceiling = new THREE.Mesh(ceilingGeo, ceilingMat);
+        ceiling.rotation.x = Math.PI/2;
+        ceiling.position.y = tileSize;
+        ceiling.position.x += x*tileSize+tileSize/2;
+        ceiling.position.z += y*tileSize+tileSize/2;
+        scene.add(ceiling);
+        objects.push(ceiling);
+        // ground
+        var groundGeo = new THREE.PlaneGeometry(tileSize, tileSize, 100, 100);
+        var groundMat = new THREE.MeshPhongMaterial({
+          color: 0x00ff00
+        });
+        var ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = 3*Math.PI/2;
+        ground.position.y = 0;
+        ground.position.x += x*tileSize+tileSize/2;
+        ground.position.z += y*tileSize+tileSize/2;
+        scene.add(ground);
+        objects.push(ground);
+        // walls
         var plane;
         if (tile.up) {
           plane = getPlane();
