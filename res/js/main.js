@@ -1,45 +1,3 @@
-var sample = {
-  start: {x:1, y:1},
-  end: {x:0, y:0},
-  cols:3,
-  rows:3,
-  maze: [
-    [
-      {
-        wall: false
-      },
-      {
-        wall: false
-      },
-      {
-        wall: false
-      }
-    ],
-    [
-      {
-        wall: true
-      },
-      {
-        wall: false
-      },
-      {
-        wall: true
-      }
-    ],
-    [
-      {
-        wall: false
-      },
-      {
-        wall: true
-      },
-      {
-        wall: false
-      }
-    ]
-  ]
-};
-
 $(function($) {
   // vars
   var el, renderer, camera, scene, cube, spotLight, controls, ray, dirLight;
@@ -177,7 +135,7 @@ $(function($) {
     scene = new THREE.Scene();
 
     // get maze object
-    mazeObject = mazegen(8,8);
+    mazeObject = mazegen(15,15);
 
     // camera
     camera = new THREE.PerspectiveCamera(60,
