@@ -49,6 +49,9 @@ $(function($) {
   var horror2 = new Audio('res/aud/horror2.ogg');
   horror2.preload = 'auto';
   back.volume = 0.5;
+  var horror3 = new Audio('res/aud/horror3.ogg');
+  horror3.preload = 'auto';
+  back.volume = 0.5;
 
 
   // var prevcam
@@ -148,11 +151,14 @@ $(function($) {
     prevCam.copy(controls.getObject().position);
 
     //noises
-    if (Math.random() > 0.9996) {
+    if (Math.random() > 0.991) {
       horror1.play();
     }
     if (Math.random() > 0.9996) {
       horror2.play();
+    }
+    if (Math.random() > 0.991) {
+      horror3.play();
     }
 
     if (settings.spike && Math.random() > 0.42) {
