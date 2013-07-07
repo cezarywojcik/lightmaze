@@ -5,6 +5,7 @@ var last = {};
 
 //rows and cols must be positive integers 3 or greater
 function mazegen(rows,cols) {
+  maze = [];
   _rows = rows;
   _cols = cols;
 
@@ -13,16 +14,16 @@ function mazegen(rows,cols) {
       x: Math.floor(cols/2),
       y: Math.floor(rows/2)
     },
+    end : {},
     rows: rows,
     cols: cols
   };
 
-  for (var i = 0; i < cols; i++) {
+  for (var i = 0; i < _cols; i++) {
     maze[i] = [];
-    for (var j = 0; j < rows; j++) {
-      maze[i][j] = {
-        wall: true
-      };
+    for (var j = 0; j < _rows; j++) {
+      maze[i][j] = {};
+      maze[i][j].wall = true;
     }
   }
 

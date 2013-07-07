@@ -128,7 +128,7 @@ $(function($) {
     // prevcam
     prevCam.copy(controls.getObject().position);
 
-    // add maze.
+    // add maze
     addMaze();
 
     // render
@@ -170,7 +170,7 @@ $(function($) {
         spotLight.intensity -= settings.spikeValue;
         settings.spike = true;
       }
-      if(settings.started) {
+      if(settings.started && settings.lightOn) {
         spotLight.intensity -= Math.random()/180;
       }
     }
