@@ -69,7 +69,7 @@ function pathing(x, y, enterdir, pathcount) {
   var rightpathed = maze[x+1][y].pathed;
 
   //dead-end check
-  if ((upblocked && downblocked && leftblocked && rightblocked) || (pathcount > deadthresh && Math.random() > 0.20)) {
+  if ((upblocked||uppathed) && (downblocked||downpathed) && (leftblocked||leftpathed) && (rightblocked||rightpathed)/* || (pathcount > deadthresh && Math.random() > 0.20)*/) {
     deadends.push([x, y, pathcount]);
   } else {
 
@@ -78,19 +78,19 @@ function pathing(x, y, enterdir, pathcount) {
       var exitdir = Math.random() * 4;
 
       while (1) {
-        if (exitdir < 1 && !upblocked) {
+        if (exitdir < 1 && !upblocked && !uppathed) {
           uppathed = true;
           pathing(x, y-1, "up", pathcount+1);
           break;
-        } else if (exitdir < 2 && !downblocked) {
+        } else if (exitdir < 2 && !downblocked && !downpathed) {
           downpathed = true;
           pathing(x, y+1, "down", pathcount+1);
           break;
-        } else if (exitdir < 3 && !leftblocked) {
+        } else if (exitdir < 3 && !leftblocked && !leftpathed) {
           leftpathed = true;
           pathing(x-1, y, "left", pathcount+1);
           break;
-        } else if (!rightblocked) {
+        } else if (!rightblocked && !rightpathed) {
           rightpathed = true;
           pathing(x+1, y, "right", pathcount+1);
           break;
@@ -105,16 +105,16 @@ function pathing(x, y, enterdir, pathcount) {
     while (Math.random() < 0.2 && !((upblocked||uppathed) && (downblocked||downpathed) && (leftblocked||leftpathed) && (rightblocked||rightpathed)));
   }
 
-  if (!uppathed && !upblocked) {
+  if (!uppathed) {
     maze[x][y-1].wall = true;
   }
-  if (!downpathed && !downblocked) {
+  if (!downpathed) {
     maze[x][y+1].wall = true;
   }
-  if (!leftpathed && !leftblocked) {
+  if (!leftpathed) {
     maze[x-1][y].wall = true;
   }
-  if (!rightpathed && !rightblocked) {
+  if (!rightpathed) {
     maze[x+1][y].wall = true;
   }
 }
