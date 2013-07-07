@@ -41,7 +41,8 @@ $(function($) {
   var numTexturesLoaded = 0;
   var textures = {
     wallTexture: loadTexture('res/img/wall.png'),
-    ceilingTexture: loadTexture('res/img/ceiling.png')
+    ceilingTexture: loadTexture('res/img/ceiling.png'),
+    endTexture: loadTexture('res/img/end.png')
   };
 
   document.addEventListener("click", function(e) {
@@ -50,10 +51,9 @@ $(function($) {
   });
 
   $(window).keypress(function(e) {
-       var key = e.keyCode;
-
-       if(key == 13 && settings.started)
-         pauseGame();
+     var key = e.keyCode;
+     if(key == 13 && settings.started)
+       pauseGame();
    });
 
   function loadTexture(image) {
@@ -192,6 +192,11 @@ $(function($) {
         var groundMat = new THREE.MeshPhongMaterial({
           map: textures.ceilingTexture
         });
+        if (x === mazeObject.end.x && y === mazeObject.end.y) {
+          groundMat = new THREE.MeshPhongMaterial({
+            map: textures.endTexture
+          });
+        }
         var ground = new THREE.Mesh(groundGeo, groundMat);
         ground.rotation.x = 3*Math.PI/2;
         ground.position.y = 0;
@@ -249,7 +254,7 @@ function giveGameFocus(giveFocus){
 
     if (havePointerLock) {
       var element = document.body;
-      var pointerlockchange = function ( event ) {
+      var pointerlockchange = function (event) {
         if ( document.pointerLockElement === element ||
           document.mozPointerLockElement === element ||
           document.webkitPointerLockElement === element ) {
@@ -260,7 +265,7 @@ function giveGameFocus(giveFocus){
       };
     }
 
-        var pointerlockerror = function ( event ) {
+        var pointerlockerror = function (event) {
         };
 
         // Hook pointer lock state change events
