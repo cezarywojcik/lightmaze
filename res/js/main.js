@@ -169,13 +169,14 @@ $(function($) {
     }
 
     var tilePoint = getTile(controls.getObject());
-    
+
     if(spotLight.intensity < -1) {
       document.location.reload(true);
     }
 
     if (spotLight.intensity < 0) {
       document.getElementById("endGame").style.zIndex = 2;
+      horror2.play();
     } else if (spotLight.intensity < 1 && back.volume > 0.006) {
       back.volume -= 0.004;
     }
