@@ -83,7 +83,9 @@ THREE.PointerLockControls = function (camera, mazeObject) {
         break;
 
       case 32: // space
-        if (canJump === true) velocity.y += 10;
+        if (canJump === true){
+          velocity.y += 10;
+        }
         canJump = false;
         break;
 
@@ -186,12 +188,22 @@ THREE.PointerLockControls = function (camera, mazeObject) {
     }
 
     if (yawObject.position.y < tileSize/2) {
+      if (!canJump) {
+        if (!footstepsPlaying && (moveForward || moveBackward ||
+          moveLeft || moveRight)) {
+          footsteps.play();
+          footstepsPlaying = true;
+        }
+      }
 
       velocity.y = 0;
       yawObject.position.y = tileSize/2;
 
       canJump = true;
 
+    } else {
+      footsteps.pause();
+      footstepsPlaying = false;
     }
 
   };
