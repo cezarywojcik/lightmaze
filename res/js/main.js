@@ -4,7 +4,8 @@ var settings = {
     spikeValue: 0,
     endGame: false,
     lightOn: true,
-    started: false
+    started: false,
+    alreadyScreamed: false
   };
 
 var controls;
@@ -176,7 +177,12 @@ $(function($) {
 
     if (spotLight.intensity < 0) {
       document.getElementById("endGame").style.zIndex = 2;
-      horror2.play();
+      
+      if(!settings.alreadyScreamed) {
+        horror2.play();
+        settings.alreadyScreamed = true;
+      }
+      
     } else if (spotLight.intensity < 1 && back.volume > 0.006) {
       back.volume -= 0.004;
     }
@@ -190,7 +196,12 @@ $(function($) {
       spotLight.intensity += Math.random();
       spotLight.exponent -= Math.random();
       spotLight.distance = 20000;
-      horror2.play();
+
+      if(!settings.alreadyScreamed) {
+        horror2.play();
+        settings.alreadyScreamed = true;
+      }
+
       if (spotLight.exponent < 1) {
         // restart
         document.location.reload(true);
