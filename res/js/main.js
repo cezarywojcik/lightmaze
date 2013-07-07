@@ -237,13 +237,14 @@ $(function($) {
     if (settings.endGame) {
       spotLight.intensity += Math.random();
       spotLight.exponent -= Math.random();
+      spotLight.distance = 20000;
     } else  if (settings.lightOn) {
       if (!settings.spike && Math.random() > 0.95) {
         settings.spikeValue = Math.random()*spotLight.intensity;
         spotLight.intensity -= settings.spikeValue;
         settings.spike = true;
       }
-      spotLight.intensity -= Math.random()/100;
+      spotLight.intensity -= Math.random()/150;
     }
 
     spotLight.target.position.y = controls.getPitchObject().rotation.x;
