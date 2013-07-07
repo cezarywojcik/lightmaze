@@ -35,7 +35,7 @@ var sample = {
   ]
 };
 
-jQuery(function($) {
+$(function($) {
   // vars
   var el, renderer, camera, scene, cube, pointLight;
 
@@ -43,7 +43,16 @@ jQuery(function($) {
 
   var tileSize = 512;
 
-  function init(selector) {
+  var selector = '#game';
+
+  // texture
+  // var wallTexture = new THREE.ImageUtils.loadTexture('res/img/wall.png',
+  //   new THREE.UVMapping(), function() {
+  //     init();
+  //   });
+  // wallTexture.needsUpdate = true;
+
+  function init() {
     el = $(selector);
 
     // renderer
@@ -64,7 +73,6 @@ jQuery(function($) {
     // point light
     pointLight = new THREE.PointLight(0xffffff, 0.6);
     pointLight.position = camera.position;
-    pointLight.rotation = camera.rotation;
     scene.add(pointLight);
 
     // object
@@ -82,6 +90,7 @@ jQuery(function($) {
     renderer.render(scene, camera);
 
     camera.rotation.y += 0.02;
+    pointLight.position.y += 0.02;
 
     requestAnimationFrame(render);
   }
@@ -104,11 +113,10 @@ jQuery(function($) {
     var floorGeo = new THREE.PlaneGeometry(width, height,
       mazeObject.cols, mazeObject.rows);
     var floorMat = new THREE.MeshLambertMaterial({
-      color: 0x00ff00,
-      side: THREE.BackSide
+      color: 0x00ff00
     });
     var floor = new THREE.Mesh(floorGeo, floorMat);
-    floor.rotation.x = Math.PI/2;
+    floor.rotation.x = 3*Math.PI/2;
     floor.position.x = tileSize;
     floor.position.z = tileSize;
     scene.add(floor);
@@ -131,7 +139,7 @@ jQuery(function($) {
         var y = i;
         var geometry, plane;
         var material = new THREE.MeshLambertMaterial({
-            color: 0xff0000
+          color: 0xff0000
         });
         if (tile.up) {
           geometry = getPlaneGeometry();
@@ -195,10 +203,10 @@ jQuery(function($) {
 
   // resize handler
   $(window).resize(function() {
-      camera.aspect = window.innerWidth/(window.innerHeight-4);
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight-4);
-    });
+    camera.aspect = window.innerWidth/(window.innerHeight-4);
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight-4);
+  });
 
-  init('#game');
+  init();
 });
