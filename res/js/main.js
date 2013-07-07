@@ -160,7 +160,7 @@ $(function($) {
       spotLight.intensity += Math.random();
       spotLight.exponent -= Math.random();
       spotLight.distance = 20000;
-      if (spotLight.exponent < 10) {
+      if (spotLight.exponent < 0) {
         // restart
         document.location.reload(true);
       }
