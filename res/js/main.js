@@ -1,40 +1,3 @@
-var sample = {
-  start: {x:0, y:0},
-  end: {x:2, y:2},
-  cols: 2,
-  rows: 2,
-  maze: [
-    [
-      {
-        up: true,
-        down: false,
-        left: true,
-        right: false
-      },
-      {
-        up: true,
-        down: false,
-        left: false,
-        right: true
-      }
-    ],
-    [
-      {
-        up: false,
-        down: true,
-        left: true,
-        right: false
-      },
-      {
-        up: false,
-        down: true,
-        left: false,
-        right: true
-      }
-    ]
-  ]
-};
-
 $(function($) {
   // vars
   var el, renderer, camera, scene, cube, spotLight, controls, ray, dirLight;
@@ -151,7 +114,6 @@ $(function($) {
 
   function textureLoaded() {
     numTexturesLoaded++;
-    console.log(numTexturesLoaded);
     if (numTexturesLoaded === Object.keys(textures).length) {
       init();
     }
@@ -168,6 +130,9 @@ $(function($) {
     // scene
     scene = new THREE.Scene();
 
+    // get maze object
+    mazeObject = mazegen(5, 5);
+
     // camera
     camera = new THREE.PerspectiveCamera(60,
           window.innerWidth/(window.innerHeight), 0.1, 10000);
@@ -179,6 +144,10 @@ $(function($) {
     controls.getObject().position.z = tileSize;
     controls.enabled = true;
     scene.add(controls.getObject());
+
+    // start location
+    controls.getObject().position.x = mazeObject.start.x*tileSize+tileSize/2;
+    controls.getObject().position.z = mazeObject.start.y*tileSize+tileSize/2;
 
     // spot light
     spotLight = new THREE.SpotLight(0xffffff, settings.lightIntensity,
@@ -199,9 +168,6 @@ $(function($) {
     // ray caster
     ray = new THREE.Raycaster();
 
-    // get maze object
-    mazeObject = mazegen(5, 5);
-
     // add maze.
     addMaze();
 
@@ -213,7 +179,7 @@ $(function($) {
   function render() {
     renderer.render(scene, camera);
 
-    spotLight.target.position.y = controls.getPitchObject().rotation.x+0.3;
+    spotLight.target.position.y = controls.getPitchObject().rotation.x+0.35;
 
     controls.update(Date.now() - time);
 
