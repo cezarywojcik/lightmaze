@@ -84,7 +84,7 @@ $(function($) {
     scene = new THREE.Scene();
 
     // get maze object
-    mazeObject = mazegen(45,45);
+    mazeObject = mazegen(20,20);
 
     // camera
     camera = new THREE.PerspectiveCamera(60,
