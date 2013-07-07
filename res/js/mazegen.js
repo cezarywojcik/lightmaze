@@ -51,6 +51,19 @@ function mazegen(rows, cols) {
     pathing(start.x, start.y - 1, "up", 0);
   }
 
+  //clear out paths just in case we've blocked off something accidentally
+  for (var k = 0; k <= maxheight; k++) { //rows
+
+    for (var l = 0; l <= maxwidth; l++) { //columns (cells)
+      {
+        if (maze[k][l].pathed === true) {
+          maze[k][l].wall = false;
+        }
+      }
+    }
+
+  }
+
   //determine end point
   var greatest_dist = 0;
   var end = {};
