@@ -192,7 +192,7 @@ $(function($) {
       }
     } else if (settings.lightOn) {
       if (!settings.spike && Math.random() >
-        spotLight.intensity/settings.lightIntensity) {
+        (spotLight.intensity/settings.lightIntensity)*0.8+0.2) {
         settings.spikeValue = Math.random()*spotLight.intensity*0.9;
         spotLight.intensity -= settings.spikeValue;
         settings.spike = true;
