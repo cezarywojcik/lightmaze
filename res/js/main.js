@@ -240,8 +240,8 @@ $(function($) {
     for (var i = 0; i < mazeObject.cols; i++) {
       for (var j = 0; j < mazeObject.rows; j++) {
         var tile = maze[i][j];
-        var x = j;
-        var y = i;
+        var x = i;
+        var y = j;
         // ceiling
         var ceilingGeo = new THREE.PlaneGeometry(tileSize, tileSize, 5, 5);
         var ceilingMat = new THREE.MeshPhongMaterial({
