@@ -151,14 +151,16 @@ $(function($) {
     prevCam.copy(controls.getObject().position);
 
     //noises
-    if (Math.random() > 0.999) {
-      horror1.play();
-    }
-    if (Math.random() > 0.9996) {
-      horror2.play();
-    }
-    if (Math.random() > 0.999) {
-      horror3.play();
+    if (settings.started) {
+      if (Math.random() > 0.999) {
+        horror1.play();
+      }
+      if (Math.random() > 0.9996) {
+        horror2.play();
+      }
+      if (Math.random() > 0.999) {
+        horror3.play();
+      }
     }
 
     if (settings.spike && Math.random() > 0.42) {
@@ -171,7 +173,7 @@ $(function($) {
     if (spotLight.intensity < 0) {
       // end game
     } else if (spotLight.intensity < 1 && back.volume > 0.006) {
-      back.volume -= 0.005;
+      back.volume -= 0.004;
     }
 
     if (tilePoint.x === mazeObject.end.x && tilePoint.y === mazeObject.end.y) {
