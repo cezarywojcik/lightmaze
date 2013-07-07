@@ -75,7 +75,7 @@ jQuery(function($) {
   function render() {
     renderer.render(scene, camera);
 
-    camera.rotation.y += 0.02;
+    camera.rotation.y += 0.005;
 
     requestAnimationFrame(render);
   }
@@ -92,6 +92,31 @@ jQuery(function($) {
 
   // add maze meshes from mazeObject
   function addMaze() {
+    // floor
+    var width = mazeObject.cols*tileSize;
+    var height = mazeObject.rows*tileSize;
+    var floorGeo = new THREE.PlaneGeometry(width, height,
+      mazeObject.cols, mazeObject.rows);
+    var floorMat = new THREE.MeshLambertMaterial({
+      color: 0x00ff00,
+      side: THREE.BackSide
+    });
+    var floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = Math.PI/2;
+    floor.position.x = tileSize;
+    floor.position.z = tileSize;
+    scene.add(floor);
+    // ceiling
+    var ceilingMat = new THREE.MeshLambertMaterial({
+      color: 0x0000ff
+    });
+    var ceiling = new THREE.Mesh(floorGeo, ceilingMat);
+    ceiling.position.y = tileSize;
+    ceiling.rotation.x = Math.PI/2;
+    ceiling.position.x = tileSize;
+    ceiling.position.z = tileSize;
+    scene.add(ceiling);
+    // add walls
     var maze = mazeObject.maze;
     for (var i = 0; i < mazeObject.cols; i++) {
       for (var j = 0; j < mazeObject.rows; j++) {
