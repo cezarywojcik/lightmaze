@@ -151,13 +151,13 @@ $(function($) {
     prevCam.copy(controls.getObject().position);
 
     //noises
-    if (Math.random() > 0.9996) {
+    if (Math.random() > 0.991) {
       horror1.play();
     }
     if (Math.random() > 0.9996) {
       horror2.play();
     }
-    if (Math.random() > 0.9996) {
+    if (Math.random() > 0.991) {
       horror3.play();
     }
 
