@@ -17,7 +17,8 @@ $(function($) {
   var settings = {
     lightIntensity: 10,
     spike: false,
-    spikeValue: 0
+    spikeValue: 0,
+    endGame: false
   };
 
   var havePointerLock = 'pointerLockElement' in document ||
@@ -133,7 +134,7 @@ $(function($) {
     scene = new THREE.Scene();
 
     // get maze object
-    mazeObject = mazegen(5, 5);
+    mazeObject = mazegen(15, 15);
 
     // camera
     camera = new THREE.PerspectiveCamera(60,
@@ -156,6 +157,12 @@ $(function($) {
       tileSize*4);
     spotLight.angle = Math.PI/4;
     spotLight.exponent = 30;
+    spotLight.castShadow = true;
+    spotLight.shadowMapWidth = 1024;
+    spotLight.shadowMapHeight = 1024;
+    spotLight.shadowCameraNear = 500;
+    spotLight.shadowCameraFar = 4000;
+    spotLight.shadowCameraFov = 30;
     spotLight.target.position.set(0, controls.getPitchObject().rotation.x, -1);
     controls.getObject().add(spotLight.target);
     spotLight.position = controls.getObject().position;
@@ -174,18 +181,28 @@ $(function($) {
   // render
   function render() {
     renderer.render(scene, camera);
-
-    if (!settings.spike && Math.random() > 0.95) {
-      settings.spikeValue = Math.random()*spotLight.intensity;
-      spotLight.intensity -= settings.spikeValue;
-      settings.spike = true;
-    }
     if (settings.spike && Math.random() > 0.4) {
       spotLight.intensity += settings.spikeValue;
       settings.spike = false;
     }
 
-    spotLight.intensity -= Math.random()/100;
+
+    if (spotLight.intensity < 0) {
+      settings.endGame = true;
+      spotLight.angle = Math.PI/2;
+    }
+
+    if (settings.endGame) {
+      spotLight.intensity += Math.random();
+      spotLight.exponent -= Math.random();
+    } else {
+      if (!settings.spike && Math.random() > 0.95) {
+        settings.spikeValue = Math.random()*spotLight.intensity;
+        spotLight.intensity -= settings.spikeValue;
+        settings.spike = true;
+      }
+      spotLight.intensity -= Math.random()/100;
+    }
 
     spotLight.target.position.y = controls.getPitchObject().rotation.x;
 
@@ -200,7 +217,9 @@ $(function($) {
   function getPlane() {
     var geometry = new THREE.PlaneGeometry(tileSize, tileSize, 5, 5);
     var material = new THREE.MeshPhongMaterial({
-      map: textures.wallTexture
+      map: textures.wallTexture,
+      reflectivity: 0.9,
+      shininess: 50
     });
     var result = new THREE.Mesh(geometry, material);
     result.overdraw = true;
