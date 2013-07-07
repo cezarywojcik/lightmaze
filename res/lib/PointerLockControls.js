@@ -39,13 +39,16 @@ THREE.PointerLockControls = function (camera, mazeObject) {
 
     if (scope.enabled === false) return;
 
-    var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-    var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+    var movementX = event.movementX || event.mozMovementX ||
+      event.webkitMovementX || 0;
+    var movementY = event.movementY || event.mozMovementY ||
+      event.webkitMovementY || 0;
 
     yawObject.rotation.y -= movementX * 0.002;
     pitchObject.rotation.x -= movementY * 0.002;
 
-    pitchObject.rotation.x = Math.max(- PI_2, Math.min(PI_2, pitchObject.rotation.x));
+    pitchObject.rotation.x = Math.max(- PI_2, Math.min(PI_2,
+      pitchObject.rotation.x));
 
   };
 
@@ -121,13 +124,13 @@ THREE.PointerLockControls = function (camera, mazeObject) {
   };
 
   this.getPitchObject = function () {
-  	return pitchObject;
-  }
+    return pitchObject;
+  };
 
-  this.isOnObject = function (boolean) {
+  this.isOnObject = function(b) {
 
-    isOnObject = boolean;
-    canJump = boolean;
+    isOnObject = b;
+    canJump = b;
 
   };
 
@@ -149,22 +152,20 @@ THREE.PointerLockControls = function (camera, mazeObject) {
     if (moveRight) velocity.x += 0.72 * delta;
 
     if (isOnObject === true) {
-
       velocity.y = Math.max(0, velocity.y);
-
     }
 
     yawObject.translateX(velocity.x);
     if (getTile(yawObject).wall) {
-      yawObject.translateX(-2*velocity.x);
+      yawObject.translateX(-1*velocity.x);
     }
     yawObject.translateY(velocity.y);
     if (getTile(yawObject).wall) {
-      yawObject.translateY(-2*velocity.y);
+      yawObject.translateY(-1*velocity.y);
     }
     yawObject.translateZ(velocity.z);
     if (getTile(yawObject).wall) {
-      yawObject.translateZ(-2*velocity.z);
+      yawObject.translateZ(-1*velocity.z);
     }
 
     if (yawObject.position.y < tileSize/2) {
