@@ -4,6 +4,13 @@
 
 THREE.PointerLockControls = function (camera, mazeObject) {
 
+  var footsteps = new Audio('res/aud/footsteps.ogg');
+  footsteps.preload = 'auto';
+  footsteps.loop = true;
+  footsteps.volume = 0.5;
+
+  var footstepsPlaying = false;
+
   var tileSize = 512;
 
   var scope = this;
@@ -81,6 +88,11 @@ THREE.PointerLockControls = function (camera, mazeObject) {
         break;
 
     }
+    if (!footstepsPlaying && (moveForward || moveBackward ||
+      moveLeft || moveRight)) {
+      footsteps.play();
+      footstepsPlaying = true;
+    }
 
   };
 
@@ -108,6 +120,11 @@ THREE.PointerLockControls = function (camera, mazeObject) {
         moveRight = false;
         break;
 
+    }
+    if (footstepsPlaying && !moveForward  && !moveBackward  &&
+      !moveLeft  && !moveRight) {
+      footsteps.pause();
+      footstepsPlaying = false;
     }
 
   };
