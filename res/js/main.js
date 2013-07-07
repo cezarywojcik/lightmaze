@@ -37,13 +37,17 @@ var sample = {
 
 $(function($) {
   // vars
-  var el, renderer, camera, scene, cube, pointLight;
+  var el, renderer, camera, scene, cube, spotLight, controls;
 
   var mazeObject;
 
   var tileSize = 512;
 
   var selector = '#game';
+
+  var velocity = 50;
+
+  var time = Date.now();
 
   // texture
   // var wallTexture = new THREE.ImageUtils.loadTexture('res/img/wall.png',
@@ -60,20 +64,33 @@ $(function($) {
     renderer.setSize(window.innerWidth, window.innerHeight-4);
     el.html(renderer.domElement);
 
+    // scene
+    scene = new THREE.Scene();
+
     // camera
     camera = new THREE.PerspectiveCamera(60,
           window.innerWidth/(window.innerHeight-4), 0.1, 5000);
     camera.position.y = tileSize/2;
-    camera.position.x = tileSize;
-    camera.position.z = tileSize;
 
-    // scene
-    scene = new THREE.Scene();
+    // controls
+    controls = new THREE.PointerLockControls(camera);
+    controls.getObject().position.x = tileSize;
+    controls.getObject().position.z = tileSize;
+    controls.enabled = true;
+    scene.add(controls.getObject());
 
-    // point light
-    pointLight = new THREE.PointLight(0xffffff, 0.6);
-    pointLight.position = camera.position;
-    scene.add(pointLight);
+    // spot light
+    spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.position.copy(camera.position);
+    spotLight.position = controls.getObject().position;
+    spotLight.castShadow = true;
+    spotLight.shadowMapWidth = 1024;
+    spotLight.shadowMapHeight = 1024;
+    spotLight.shadowCameraNear = 500;
+    spotLight.shadowCameraFar = 4000;
+    spotLight.shadowCameraFov = 60;
+    spotLight.target.position.y = tileSize/2;
+    scene.add(spotLight);
 
     // object
     mazeObject = sample;
@@ -89,8 +106,9 @@ $(function($) {
   function render() {
     renderer.render(scene, camera);
 
-    camera.rotation.y += 0.02;
-    pointLight.position.y += 0.02;
+    controls.update(Date.now() - time);
+
+    time = Date.now();
 
     requestAnimationFrame(render);
   }
