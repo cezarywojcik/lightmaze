@@ -1,126 +1,128 @@
 var maze = [];
 var deadends = [];
 var deadthresh = 6;
+var totalpathed = 0;
 
 //rows and cols must be positive integers 3 or greater
-function mazegen(rows,cols) {
+function mazegen(rows, cols) {
 
   var maxheight = rows - 1; //counting 0
   var maxwidth = cols - 1;
+
+  deadthresh = Math.ceil((rows + cols) * 0.7);
 
   for (var i = 0; i <= maxheight; i++) { //rows
 
     maze[i] = [];
 
     for (var j = 0; j <= maxwidth; j++) { //columns (cells)
-      maze[i][j] = {
-      pathed: false,
-
-      up: true,
-      down: true,
-      left: true,
-      right: true
-    };
+      {
+        maze[i][j] = {};
+        maze[i][j].pathed = false;
+        if (i === 0 || j === 0 || i === maxheight || j === maxwidth) {
+          maze[i][j].wall = true;
+        } else {
+          maze[i][j].wall = false;
+        }
+      }
     }
 
   }
 
   start = {
-    x: Math.floor(maxwidth/2),
-    y: Math.floor(maxheight/2)
+    x: Math.floor(maxwidth / 2),
+    y: Math.floor(maxheight / 2)
   };
 
   //force the start point to open upward
   maze[start.x][start.y] = {
-  pathed: true,
-  isInSolution: true,
-  up: false,
-  down: true,
-  left: true,
-  right: true
+    pathed: true,
+    isInSolution: true
   };
+  totalpathed = totalpathed + 1;
+  //put walls around the start
+  maze[start.x + 1][start.y].wall = true;
+  maze[start.x - 1][start.y].wall = true;
+  maze[start.x][start.y + 1].wall = true;
 
   //begin generation from the tile above the start
-  pathing(start.x, start.y-1, "up", 0, maxheight, maxwidth);
-
-  //now clear all unused cells so they don't bog down the graphics
-  for (k = 0; k <= maxheight; k++) { //rows
-    for (l = 0; l <= maxwidth; l++) { //columns (cells)
-      if (!maze[k][l].pathed) {
-        maze[k][l].up = false;
-        maze[k][l].down = false;
-        maze[k][l].left = false;
-        maze[k][l].right = false;
-      }
-    }
+  while (totalpathed < maxheight * maxwidth / 3) {
+    pathing(start.x, start.y - 1, "up", 0);
   }
-
   return {
     start: start,
-    end: {x:0, y:0},
+    end: { x: 0, y: 0 },
     rows: rows,
     cols: cols,
     maze: maze
   };
 }
 
-function pathing(x, y, enterdir, pathcount, maxheight, maxwidth) {
+function pathing(x, y, enterdir, pathcount) {
 
   maze[x][y].pathed = true;
+  totalpathed = totalpathed + 1;
 
-  var upblocked = (y === 0)?true:maze[x][y-1].pathed;
-  var downblocked = (y === maxheight)?true:maze[x][y+1].pathed;
-  var leftblocked = (x === 0)?true:maze[x-1][y].pathed;
-  var rightblocked = (x === maxwidth)?true:maze[x+1][y].pathed;
+  var upblocked = maze[x][y - 1].wall;
+  var downblocked = maze[x][y + 1].wall;
+  var leftblocked = maze[x - 1][y].wall;
+  var rightblocked = maze[x + 1][y].wall;
+  var uppathed = maze[x][y - 1].pathed;
+  var downpathed = maze[x][y + 1].pathed;
+  var leftpathed = maze[x - 1][y].pathed;
+  var rightpathed = maze[x + 1][y].pathed;
 
   //dead-end check
-  if ((upblocked && downblocked && leftblocked && rightblocked) || (pathcount > deadthresh && Math.random() > 0.20)) {
-    maze[x][y].up = maze[x][y].down = maze[x][y].left = maze[x][y].right = true;
-  deadends.push([x, y, pathcount]);
+  if ((upblocked || uppathed) && (downblocked || downpathed) && (leftblocked ||
+   leftpathed) && (rightblocked || rightpathed) || (pathcount > deadthresh &&
+   Math.random() < 0.20)) {
+    deadends.push([x, y, pathcount]);
   } else {
 
-    var exitdir = Math.random() * 4;
+    do {
 
-    while (1) {
-      if (exitdir < 1 && !upblocked) {
-      maze[x][y].up = false;
-        pathing(x, y-1, "up", pathcount+1, maxheight, maxwidth);
-        break;
-      } else if (exitdir < 2 && !downblocked) {
-          maze[x][y].down = false;
-        pathing(x, y+1, "down", pathcount+1, maxheight, maxwidth);
-      break;
-      } else if (exitdir < 3 && !leftblocked) {
-      maze[x][y].left = false;
-        pathing(x-1, y, "left", pathcount+1, maxheight, maxwidth);
-      break;
-      } else if (!rightblocked) {
-      maze[x][y].right = false;
-        pathing(x+1, y, "right", pathcount+1, maxheight, maxwidth);
+      var exitdir = Math.random() * 4;
+
+      for (h = 0; h < 5; h++) {
+        if (exitdir < 1 && !upblocked && !uppathed) {
+          uppathed = true;
+          pathing(x, y - 1, "up", pathcount + 1);
           break;
-      } else {
-        exitdir += 1;
-      if (exitdir > 4) {
-          exitdir -= 4;
-      }
+        } else if (exitdir < 2 && !downblocked && !downpathed) {
+          downpathed = true;
+          pathing(x, y + 1, "down", pathcount + 1);
+          break;
+        } else if (exitdir < 3 && !leftblocked && !leftpathed) {
+          leftpathed = true;
+          pathing(x - 1, y, "left", pathcount + 1);
+          break;
+        } else if (!rightblocked && !rightpathed) {
+          rightpathed = true;
+          pathing(x + 1, y, "right", pathcount + 1);
+          break;
+        } else {
+          exitdir += 1;
+          if (exitdir > 4) {
+            exitdir -= 4;
+          }
+        }
       }
     }
+    while (Math.random() < 0.2 && !((upblocked || uppathed) && (downblocked ||
+      downpathed) && (leftblocked || leftpathed) && (rightblocked ||
+      rightpathed)));
   }
 
-  //this makes sure that there isn't a wall in the direction we came from
-  //which is opposite the enterdir
-  switch(enterdir) {
-    case "up":
-      maze[x][y].down = false;
-    break;
-    case "down":
-      maze[x][y].up = false;
-    break;
-    case "left":
-      maze[x][y].right = false;
-    break;
-    case "right":
-      maze[x][y].left = false;
-    break;
+  if (!uppathed) {
+    maze[x][y - 1].wall = true;
+  }
+  if (!downpathed) {
+    maze[x][y + 1].wall = true;
+  }
+  if (!leftpathed) {
+    maze[x - 1][y].wall = true;
+  }
+  if (!rightpathed) {
+    maze[x + 1][y].wall = true;
   }
 }
