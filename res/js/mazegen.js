@@ -55,21 +55,25 @@ function pathing(x, y, enterdir, pathcount, maxheight, maxwidth) {
 
   maze[x][y].pathed = true;
   
-  var upblocked = maze[x][y-1].pathed;
-  var downblocked = maze[x][y+1].pathed;
-  var leftblocked = maze[x-1][y].pathed;
-  var rightblocked = maze[x+1][y].pathed;
   if (y==0) {
-    upblocked = true;
+    var upblocked = true;
+  } else {
+    var upblocked = maze[x][y-1].pathed;
   }
   if (y==maxheight) {
     downblocked = true;
+  } else {
+    var downblocked = maze[x][y+1].pathed;
   }
   if (x==0) {
     leftblocked = true;
+  } else {
+    var leftblocked = maze[x-1][y].pathed;
   }
   if (x==maxwidth) {
     rightblocked = true;
+  } else {
+    var rightblocked = maze[x+1][y].pathed;
   }
   
   //dead-end check
@@ -83,15 +87,19 @@ function pathing(x, y, enterdir, pathcount, maxheight, maxwidth) {
     
     while (1) {
       if (exitdir < 1 && !upblocked) {
+	    maze[x][y].up = false;
         pathing(x, y-1, "up", pathcount+1, maxheight, maxwidth);
   	    break;
       } else if (exitdir < 2 && !downblocked) {
+	    maze[x][y].down = false;
         pathing(x, y+1, "down", pathcount+1, maxheight, maxwidth);
 	    break;
       } else if (exitdir < 3 && !leftblocked) {
+	    maze[x][y].left = false;
         pathing(x-1, y, "left", pathcount+1, maxheight, maxwidth);
 	    break;
       } else if (!rightblocked) {
+	    maze[x][y].right = false;
         pathing(x+1, y, "right", pathcount+1, maxheight, maxwidth);
 	    break;
       } else {
@@ -102,20 +110,21 @@ function pathing(x, y, enterdir, pathcount, maxheight, maxwidth) {
       }
     }
   }
-  //this makes sure that there isn't a wall in the direction we came from
   
+  //this makes sure that there isn't a wall in the direction we came from
+  //which is opposite the enterdir
   switch(enterdir) {
   case "up":
-    maze[x][y].up = false;
-  break;
-  case "down":
     maze[x][y].down = false;
   break;
+  case "down":
+    maze[x][y].up = false;
+  break;
   case "left":
-    maze[x][y].left = false;
+    maze[x][y].right = false;
   break;
   case "right":
-    maze[x][y].right = false;
+    maze[x][y].left = false;
   break;
   }
 }
