@@ -1,3 +1,45 @@
+var sample = {
+  start: {x:1, y:1},
+  end: {x:0, y:0},
+  cols:3,
+  rows:3,
+  maze: [
+    [
+      {
+        wall: false
+      },
+      {
+        wall: false
+      },
+      {
+        wall: false
+      }
+    ],
+    [
+      {
+        wall: true
+      },
+      {
+        wall: false
+      },
+      {
+        wall: true
+      }
+    ],
+    [
+      {
+        wall: false
+      },
+      {
+        wall: true
+      },
+      {
+        wall: false
+      }
+    ]
+  ]
+};
+
 $(function($) {
   // vars
   var el, renderer, camera, scene, cube, spotLight, controls, ray, dirLight;
@@ -18,7 +60,8 @@ $(function($) {
     lightIntensity: 10,
     spike: false,
     spikeValue: 0,
-    endGame: false
+    endGame: false,
+    lightOn: true
   };
 
   var havePointerLock = 'pointerLockElement' in document ||
@@ -134,7 +177,7 @@ $(function($) {
     scene = new THREE.Scene();
 
     // get maze object
-    mazeObject = mazegen(15, 15);
+    mazeObject = sample;
 
     // camera
     camera = new THREE.PerspectiveCamera(60,
@@ -186,7 +229,6 @@ $(function($) {
       settings.spike = false;
     }
 
-
     if (spotLight.intensity < 0) {
       settings.endGame = true;
       spotLight.angle = Math.PI/2;
@@ -195,7 +237,7 @@ $(function($) {
     if (settings.endGame) {
       spotLight.intensity += Math.random();
       spotLight.exponent -= Math.random();
-    } else {
+    } else  if (settings.lightOn) {
       if (!settings.spike && Math.random() > 0.95) {
         settings.spikeValue = Math.random()*spotLight.intensity;
         spotLight.intensity -= settings.spikeValue;
@@ -211,20 +253,6 @@ $(function($) {
     time = Date.now();
 
     requestAnimationFrame(render);
-  }
-
-  // plane geo
-  function getPlane() {
-    var geometry = new THREE.PlaneGeometry(tileSize, tileSize, 5, 5);
-    var material = new THREE.MeshPhongMaterial({
-      map: textures.wallTexture,
-      reflectivity: 0.9,
-      shininess: 50
-    });
-    var result = new THREE.Mesh(geometry, material);
-    result.overdraw = true;
-    result.position.y = tileSize/2;
-    return result;
   }
 
   // add maze meshes from mazeObject
@@ -259,38 +287,22 @@ $(function($) {
         ground.position.z += y*tileSize+tileSize/2;
         scene.add(ground);
         objects.push(ground);
-        // walls
-        var plane;
-        if (tile.up) {
-          plane = getPlane();
-          plane.position.x = x*tileSize+tileSize/2;
-          plane.position.z = y*tileSize;
-          scene.add(plane);
-          objects.push(plane);
-        }
-        if (tile.down) {
-          plane = getPlane();
-          plane.position.x = x*tileSize+tileSize/2;
-          plane.position.z = (y+1)*tileSize;
-          plane.rotation.y = Math.PI;
-          scene.add(plane);
-          objects.push(plane);
-        }
-        if (tile.left) {
-          plane = getPlane();
-          plane.position.x = x*tileSize;
-          plane.position.z = y*tileSize+tileSize/2;
-          plane.rotation.y = Math.PI/2;
-          scene.add(plane);
-          objects.push(plane);
-        }
-        if (tile.right) {
-          plane = getPlane();
-          plane.position.x = (x+1)*tileSize;
-          plane.position.z = y*tileSize+tileSize/2;
-          plane.rotation.y = 3*Math.PI/2;
-          scene.add(plane);
-          objects.push(plane);
+        // wall
+        if (tile.wall) {
+          var wallGeo = new THREE.CubeGeometry(tileSize, tileSize, tileSize,
+            5, 5);
+          var wallMat = new THREE.MeshPhongMaterial({
+            map: textures.wallTexture,
+            reflectivity: 0.9,
+            shininess: 50
+          });
+          var wall = new THREE.Mesh(wallGeo, wallMat);
+          scene.add(wall);
+          objects.push(wall);
+          wall.overdraw = true;
+          wall.position.x = x*tileSize+tileSize/2;
+          wall.position.z = y*tileSize+tileSize/2;
+          wall.position.y = tileSize/2;
         }
       }
     }
