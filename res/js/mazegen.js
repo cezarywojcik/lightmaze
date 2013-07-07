@@ -37,6 +37,7 @@ function mazegen(rows, cols) {
   //force the start point to open upward
   maze[start.x][start.y] = {
     pathed: true,
+    wall: false,
     isInSolution: true
   };
   totalpathed = totalpathed + 1;
@@ -49,9 +50,20 @@ function mazegen(rows, cols) {
   while (totalpathed < maxheight * maxwidth / 3) {
     pathing(start.x, start.y - 1, "up", 0);
   }
+
+  //determine end point
+  var greatest_dist = 0;
+  var end = {};
+  for (var v = 0; v<deadends.length; v++) {
+    if (deadends[v][2] > greatest_dist) {
+      end.x = deadends[v][0];
+      end.y = deadends[v][1];
+    }
+  }
+
   return {
     start: start,
-    end: { x: 0, y: 0 },
+    end: end,
     rows: rows,
     cols: cols,
     maze: maze
@@ -108,7 +120,7 @@ function pathing(x, y, enterdir, pathcount) {
         }
       }
     }
-    while (Math.random() < 0.2 && !((upblocked || uppathed) && (downblocked ||
+    while (Math.random() < 0.4 && !((upblocked || uppathed) && (downblocked ||
       downpathed) && (leftblocked || leftpathed) && (rightblocked ||
       rightpathed)));
   }
