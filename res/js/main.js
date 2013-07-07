@@ -15,7 +15,11 @@ $(function($) {
   var objects = [];
 
   var settings = {
-    lightIntensity: 1
+    lightIntensity: 10,
+    spike: false,
+    spikeValue: 0,
+    endGame: false,
+    lightOn: true
   };
 
   var havePointerLock = 'pointerLockElement' in document ||
@@ -131,12 +135,11 @@ $(function($) {
     scene = new THREE.Scene();
 
     // get maze object
-    mazeObject = mazegen(5, 5);
+    mazeObject = mazegen(15,15);
 
     // camera
     camera = new THREE.PerspectiveCamera(60,
           window.innerWidth/(window.innerHeight), 0.1, 10000);
-    camera.position.y = tileSize/2;
 
     // controls
     controls = new THREE.PointerLockControls(camera);
@@ -148,22 +151,23 @@ $(function($) {
     // start location
     controls.getObject().position.x = mazeObject.start.x*tileSize+tileSize/2;
     controls.getObject().position.z = mazeObject.start.y*tileSize+tileSize/2;
+    controls.getObject().position.y = tileSize/2;
 
     // spot light
     spotLight = new THREE.SpotLight(0xffffff, settings.lightIntensity,
       tileSize*4);
     spotLight.angle = Math.PI/4;
     spotLight.exponent = 30;
+    spotLight.castShadow = true;
+    spotLight.shadowMapWidth = 1024;
+    spotLight.shadowMapHeight = 1024;
+    spotLight.shadowCameraNear = 500;
+    spotLight.shadowCameraFar = 4000;
+    spotLight.shadowCameraFov = 30;
     spotLight.target.position.set(0, controls.getPitchObject().rotation.x, -1);
     controls.getObject().add(spotLight.target);
     spotLight.position = controls.getObject().position;
     scene.add(spotLight);
-
-    // directional light
-    dirLight = new THREE.DirectionalLight(0x000000, 1);
-    dirLight.target.position.set(0, 1, 0);
-    dirLight.position = controls.getObject().position;
-    scene.add(dirLight);
 
     // ray caster
     ray = new THREE.Raycaster();
@@ -178,26 +182,36 @@ $(function($) {
   // render
   function render() {
     renderer.render(scene, camera);
+    if (settings.spike && Math.random() > 0.4) {
+      spotLight.intensity += settings.spikeValue;
+      settings.spike = false;
+    }
 
-    spotLight.target.position.y = controls.getPitchObject().rotation.x+0.35;
+    if (spotLight.intensity < 0) {
+      settings.endGame = true;
+      spotLight.angle = Math.PI/2;
+    }
+
+    if (settings.endGame) {
+      spotLight.intensity += Math.random();
+      spotLight.exponent -= Math.random();
+      spotLight.distance = 20000;
+    } else  if (settings.lightOn) {
+      if (!settings.spike && Math.random() > 0.95) {
+        settings.spikeValue = Math.random()*spotLight.intensity;
+        spotLight.intensity -= settings.spikeValue;
+        settings.spike = true;
+      }
+      spotLight.intensity -= Math.random()/150;
+    }
+
+    spotLight.target.position.y = controls.getPitchObject().rotation.x;
 
     controls.update(Date.now() - time);
 
     time = Date.now();
 
     requestAnimationFrame(render);
-  }
-
-  // plane geo
-  function getPlane() {
-    var geometry = new THREE.PlaneGeometry(tileSize, tileSize, 10, 10);
-    var material = new THREE.MeshPhongMaterial({
-      map: textures.wallTexture
-    });
-    var result = new THREE.Mesh(geometry, material);
-    result.overdraw = true;
-    result.position.y = tileSize/2;
-    return result;
   }
 
   // add maze meshes from mazeObject
@@ -232,38 +246,22 @@ $(function($) {
         ground.position.z += y*tileSize+tileSize/2;
         scene.add(ground);
         objects.push(ground);
-        // walls
-        var plane;
-        if (tile.up) {
-          plane = getPlane();
-          plane.position.x = x*tileSize+tileSize/2;
-          plane.position.z = y*tileSize;
-          scene.add(plane);
-          objects.push(plane);
-        }
-        if (tile.down) {
-          plane = getPlane();
-          plane.position.x = x*tileSize+tileSize/2;
-          plane.position.z = (y+1)*tileSize;
-          plane.rotation.y = Math.PI;
-          scene.add(plane);
-          objects.push(plane);
-        }
-        if (tile.left) {
-          plane = getPlane();
-          plane.position.x = x*tileSize;
-          plane.position.z = y*tileSize+tileSize/2;
-          plane.rotation.y = Math.PI/2;
-          scene.add(plane);
-          objects.push(plane);
-        }
-        if (tile.right) {
-          plane = getPlane();
-          plane.position.x = (x+1)*tileSize;
-          plane.position.z = y*tileSize+tileSize/2;
-          plane.rotation.y = 3*Math.PI/2;
-          scene.add(plane);
-          objects.push(plane);
+        // wall
+        if (tile.wall) {
+          var wallGeo = new THREE.CubeGeometry(tileSize, tileSize, tileSize,
+            5, 5);
+          var wallMat = new THREE.MeshPhongMaterial({
+            map: textures.wallTexture,
+            reflectivity: 0.9,
+            shininess: 50
+          });
+          var wall = new THREE.Mesh(wallGeo, wallMat);
+          scene.add(wall);
+          objects.push(wall);
+          wall.overdraw = true;
+          wall.position.x = x*tileSize+tileSize/2;
+          wall.position.z = y*tileSize+tileSize/2;
+          wall.position.y = tileSize/2;
         }
       }
     }
