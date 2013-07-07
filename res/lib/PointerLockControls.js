@@ -106,7 +106,6 @@ THREE.PointerLockControls = function (camera) {
   this.enabled = false;
 
   this.getObject = function () {
-
     return yawObject;
 
   };
@@ -149,10 +148,10 @@ THREE.PointerLockControls = function (camera) {
     yawObject.translateY(velocity.y);
     yawObject.translateZ(velocity.z);
 
-    if (yawObject.position.y < 10) {
+    if (yawObject.position.y < 512/2) {
 
       velocity.y = 0;
-      yawObject.position.y = 10;
+      yawObject.position.y = 512/2;
 
       canJump = true;
 

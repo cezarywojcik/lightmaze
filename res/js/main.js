@@ -138,7 +138,6 @@ $(function($) {
     // camera
     camera = new THREE.PerspectiveCamera(60,
           window.innerWidth/(window.innerHeight), 0.1, 10000);
-    camera.position.y = tileSize/2;
 
     // controls
     controls = new THREE.PointerLockControls(camera);
@@ -150,6 +149,7 @@ $(function($) {
     // start location
     controls.getObject().position.x = mazeObject.start.x*tileSize+tileSize/2;
     controls.getObject().position.z = mazeObject.start.y*tileSize+tileSize/2;
+    controls.getObject().position.y = tileSize/2;
 
     // spot light
     spotLight = new THREE.SpotLight(0xffffff, settings.lightIntensity,
@@ -160,12 +160,6 @@ $(function($) {
     controls.getObject().add(spotLight.target);
     spotLight.position = controls.getObject().position;
     scene.add(spotLight);
-
-    // directional light
-    dirLight = new THREE.DirectionalLight(0x000000, 1);
-    dirLight.target.position.set(0, 1, 0);
-    dirLight.position = controls.getObject().position;
-    scene.add(dirLight);
 
     // ray caster
     ray = new THREE.Raycaster();
@@ -181,19 +175,19 @@ $(function($) {
   function render() {
     renderer.render(scene, camera);
 
-    if (!settings.spike && Math.random() > 0.8) {
+    if (!settings.spike && Math.random() > 0.95) {
       settings.spikeValue = Math.random()*spotLight.intensity;
       spotLight.intensity -= settings.spikeValue;
       settings.spike = true;
     }
-    if (settings.spike && Math.random() > 0.3) {
+    if (settings.spike && Math.random() > 0.4) {
       spotLight.intensity += settings.spikeValue;
       settings.spike = false;
     }
 
     spotLight.intensity -= Math.random()/100;
 
-    spotLight.target.position.y = controls.getPitchObject().rotation.x+0.35;
+    spotLight.target.position.y = controls.getPitchObject().rotation.x;
 
     controls.update(Date.now() - time);
 
