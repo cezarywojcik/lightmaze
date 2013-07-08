@@ -13,3 +13,6 @@ $RECYCLE.BIN/
 
 # Modules
 node_modules
+
+# JS Hint
+.jshintrc

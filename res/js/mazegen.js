@@ -1,3 +1,5 @@
+/*jshint indent:2, unused:false*/
+
 var maze = [];
 var deadends = [];
 var deadthresh = 6;
@@ -5,6 +7,7 @@ var totalpathed = 0;
 
 //rows and cols must be positive integers 3 or greater
 function mazegen(rows, cols) {
+  //jshint unused:true
 
   var maxheight = rows - 1; //counting 0
   var maxwidth = cols - 1;
@@ -29,7 +32,7 @@ function mazegen(rows, cols) {
 
   }
 
-  start = {
+  var start = {
     x: Math.floor(maxwidth / 2),
     y: Math.floor(maxheight / 2)
   };
@@ -83,7 +86,7 @@ function pathing(x, y, enterdir, pathcount) {
 
       var exitdir = Math.random() * 4;
 
-      for (h = 0; h < 5; h++) {
+      for (var h = 0; h < 5; h++) {
         if (exitdir < 1 && !upblocked && !uppathed) {
           uppathed = true;
           pathing(x, y - 1, "up", pathcount + 1);
