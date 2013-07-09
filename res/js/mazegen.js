@@ -1,5 +1,3 @@
-/*jshint indent:2, unused:false*/
-
 var maze = [];
 var deadends = [];
 var deadthresh = 6;
@@ -7,12 +5,11 @@ var totalpathed = 0;
 
 //rows and cols must be positive integers 3 or greater
 function mazegen(rows, cols) {
-  //jshint unused:true
 
   var maxheight = rows - 1; //counting 0
   var maxwidth = cols - 1;
 
-  deadthresh = Math.ceil((rows + cols) * 0.7);
+  deadthresh = Math.ceil((rows + cols) * 0.5);
 
   for (var i = 0; i <= maxheight; i++) { //rows
 
@@ -32,7 +29,7 @@ function mazegen(rows, cols) {
 
   }
 
-  var start = {
+  start = {
     x: Math.floor(maxwidth / 2),
     y: Math.floor(maxheight / 2)
   };
@@ -40,6 +37,7 @@ function mazegen(rows, cols) {
   //force the start point to open upward
   maze[start.x][start.y] = {
     pathed: true,
+    wall: false,
     isInSolution: true
   };
   totalpathed = totalpathed + 1;
@@ -52,9 +50,34 @@ function mazegen(rows, cols) {
   while (totalpathed < maxheight * maxwidth / 3) {
     pathing(start.x, start.y - 1, "up", 0);
   }
+
+  //clear out paths just in case we've blocked off something accidentally
+  for (var k = 0; k <= maxheight; k++) { //rows
+
+    for (var l = 0; l <= maxwidth; l++) { //columns (cells)
+      {
+        if (maze[k][l].pathed === true) {
+          maze[k][l].wall = false;
+        }
+      }
+    }
+
+  }
+
+  //determine end point
+  var greatest_dist = 0;
+  var end = {};
+  for (var v = 0; v<deadends.length; v++) {
+    if (deadends[v][2] > greatest_dist) {
+      greatest_dist = deadends[v][2];
+      end.x = deadends[v][0];
+      end.y = deadends[v][1];
+    }
+  }
+
   return {
     start: start,
-    end: { x: 0, y: 0 },
+    end: end,
     rows: rows,
     cols: cols,
     maze: maze
@@ -76,9 +99,7 @@ function pathing(x, y, enterdir, pathcount) {
   var rightpathed = maze[x + 1][y].pathed;
 
   //dead-end check
-  if ((upblocked || uppathed) && (downblocked || downpathed) && (leftblocked ||
-   leftpathed) && (rightblocked || rightpathed) || (pathcount > deadthresh &&
-   Math.random() < 0.20)) {
+  if (((upblocked || uppathed) && (downblocked || downpathed) && (leftblocked || leftpathed) && (rightblocked || rightpathed)) || (pathcount > deadthresh && Math.random() < 0.20)) {
     deadends.push([x, y, pathcount]);
   } else {
 
@@ -86,7 +107,7 @@ function pathing(x, y, enterdir, pathcount) {
 
       var exitdir = Math.random() * 4;
 
-      for (var h = 0; h < 5; h++) {
+      for (h = 0; h < 5; h++) {
         if (exitdir < 1 && !upblocked && !uppathed) {
           uppathed = true;
           pathing(x, y - 1, "up", pathcount + 1);
@@ -111,7 +132,7 @@ function pathing(x, y, enterdir, pathcount) {
         }
       }
     }
-    while (Math.random() < 0.2 && !((upblocked || uppathed) && (downblocked ||
+    while (Math.random() < 0.3 && !((upblocked || uppathed) && (downblocked ||
       downpathed) && (leftblocked || leftpathed) && (rightblocked ||
       rightpathed)));
   }
