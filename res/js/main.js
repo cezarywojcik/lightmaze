@@ -6,8 +6,7 @@ var settings = {
   spikeValue: 0,
   endGame: false,
   lightOn: true,
-  started: false,
-  alreadyScreamed: false
+  started: false
 };
 
 var controls;
@@ -72,8 +71,17 @@ $(function($) {
 
   $(window).keypress(function(e) {
       var key = e.keyCode;
-      if(key == 13 && settings.started) {
+      if(key === 13 && settings.started) {
         pauseGame();
+      }
+      if (key === 69 && settings.started) {
+        settings.lightOn = !settings.lightOn;
+        if (settings.lightOn) {
+          spotLight.intensity = settings.spikeValue;
+        } else {
+          settings.spikeValue = spotLight.intensity;
+          spotLight.intensity = 0;
+        }
       }
     });
 
@@ -177,12 +185,7 @@ $(function($) {
 
     if (spotLight.intensity < 0) {
       document.getElementById("endGame").style.zIndex = 2;
-
-      if(!settings.alreadyScreamed) {
-        horror2.play();
-        settings.alreadyScreamed = true;
-      }
-
+      horror2.play();
     } else if (spotLight.intensity < 1 && back.volume > 0.006) {
       back.volume -= 0.004;
     }
@@ -196,12 +199,7 @@ $(function($) {
       spotLight.intensity += Math.random();
       spotLight.exponent -= Math.random();
       spotLight.distance = 20000;
-
-      if(!settings.alreadyScreamed) {
-        horror2.play();
-        settings.alreadyScreamed = true;
-      }
-
+      horror2.play();
       if (spotLight.exponent < 1) {
         // restart
         document.location.reload(true);
