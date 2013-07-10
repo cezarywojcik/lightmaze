@@ -1,3 +1,3 @@
-# YALTBEBAG
+# Dark Passage
 
-WIP
+Randomly generated 3D maze with a limited amount of light.
