@@ -179,13 +179,10 @@ $(function($) {
 
     var tilePoint = getTile(controls.getObject());
 
-    if(spotLight.intensity < -1) {
-      document.location.reload(true);
-    }
-
     if (spotLight.intensity < 0) {
       document.getElementById("endGame").style.zIndex = 2;
-      horror2.play();
+      document.location.reload();
+      return;
     } else if (spotLight.intensity < 1 && back.volume > 0.006) {
       back.volume -= 0.004;
     }
@@ -199,10 +196,9 @@ $(function($) {
       spotLight.intensity += Math.random();
       spotLight.exponent -= Math.random();
       spotLight.distance = 20000;
-      horror2.play();
       if (spotLight.exponent < 1) {
-        // restart
-        document.location.reload(true);
+        document.location.reload();
+        return;
       }
     } else if (settings.lightOn) {
       if (!settings.spike && Math.random() >
